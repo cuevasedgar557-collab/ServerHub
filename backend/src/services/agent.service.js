@@ -90,7 +90,55 @@ async function heartbeat(agentToken) {
     return agent;
 }
 
+async function saveStats(data) {
+
+    const {
+        agentToken,
+        cpu,
+        ram,
+        disk
+    } = data;
+
+    const agentResult = await pool.query(
+        `
+        SELECT id
+        FROM agents
+        WHERE agent_token = $1
+        `,
+        [agentToken]
+    );
+
+    const agent = agentResult.rows[0];
+
+    if (!agent) {
+        throw new Error("Agent token inválido");
+    }
+
+    const result = await pool.query(
+        `
+        INSERT INTO server_metrics
+        (
+            agent_id,
+            cpu_usage,
+            ram_usage,
+            disk_usage
+        )
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+        `,
+        [
+            agent.id,
+            cpu,
+            ram,
+            disk
+        ]
+    );
+
+    return result.rows[0];
+}
+
 module.exports = {
     registerAgent,
-    heartbeat
+    heartbeat,
+    saveStats
 };

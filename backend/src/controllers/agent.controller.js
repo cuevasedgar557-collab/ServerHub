@@ -50,7 +50,32 @@ async function heartbeat(req, res) {
     }
 }
 
+async function saveStats(req, res) {
+
+    try {
+
+        const stats =
+            await agentService.saveStats(
+                req.body
+            );
+
+        res.status(201).json({
+            success: true,
+            stats
+        });
+
+    } catch (error) {
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
 module.exports = {
     registerAgent,
-    heartbeat
+    heartbeat,
+    saveStats
 };
