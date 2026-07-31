@@ -153,6 +153,30 @@ async function deleteServer(req, res) {
 
     }
 }
+async function getServerMetrics(req, res) {
+
+    try {
+
+        const metrics =
+            await serverService.getServerMetrics(
+                req.user.id,
+                req.params.id
+            );
+
+        res.json({
+            success: true,
+            metrics
+        });
+
+    } catch (error) {
+
+        res.status(404).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
 
 
 module.exports = {
@@ -162,5 +186,6 @@ module.exports = {
     getServers,
     getServerById,
     updateServer,
-    deleteServer
+    deleteServer,
+    getServerMetrics
 };

@@ -25,15 +25,41 @@ async function getServers(userId) {
 
     const result = await pool.query(
         `
-        SELECT *
-        FROM servers
-        WHERE user_id = $1
-        ORDER BY id ASC
+        SELECT
+            s.*,
+            a.last_seen
+        FROM servers s
+        LEFT JOIN agents a
+            ON a.server_id = s.id
+        WHERE s.user_id = $1
+        ORDER BY s.id ASC
         `,
         [userId]
     );
 
-    return result.rows;
+    return result.rows.map(server => {
+
+        let connectionStatus = "offline";
+
+        if (server.last_seen) {
+
+            const diff =
+                Date.now() -
+                new Date(server.last_seen).getTime();
+
+            const twoMinutes = 2 * 60 * 1000;
+
+            if (diff <= twoMinutes) {
+                connectionStatus = "online";
+            }
+
+        }
+
+        return {
+            ...server,
+            connectionStatus
+        };
+    });
 }
 
 async function getServerById(userId, serverId) {
@@ -94,12 +120,51 @@ async function deleteServer(userId, serverId) {
     return result.rows[0];
 }
 
+async function getServerMetrics(userId, serverId) {
 
+    const serverResult = await pool.query(
+        `
+        SELECT id
+        FROM servers
+        WHERE id = $1
+        AND user_id = $2
+        `,
+        [serverId, userId]
+    );
+
+    const server = serverResult.rows[0];
+
+    if (!server) {
+        throw new Error("Servidor no encontrado");
+    }
+
+    const metricsResult = await pool.query(
+        `
+        SELECT
+            cpu_usage,
+            ram_usage,
+            disk_usage,
+            created_at
+        FROM server_metrics
+        WHERE agent_id IN (
+            SELECT id
+            FROM agents
+            WHERE server_id = $1
+        )
+        ORDER BY created_at DESC
+        LIMIT 100
+        `,
+        [serverId]
+    );
+
+    return metricsResult.rows;
+}
 
 module.exports = {
     createServer,
     getServers,
     getServerById,
     updateServer,
-    deleteServer
+    deleteServer,
+    getServerMetrics
 };
