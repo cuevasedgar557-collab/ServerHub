@@ -5,6 +5,8 @@ const serverRoutes = require("./routes/server.routes");
 const authRoutes = require("./routes/auth.routes");
 const registrationKeyRoutes =
     require("./routes/registration-key.routes");
+const agentRoutes =
+    require("./routes/agent.routes");
 
 const app = express();
 
@@ -16,6 +18,10 @@ app.use("/api/auth", authRoutes);
 app.use(
     "/api/registration-keys",
     registrationKeyRoutes
+);
+app.use(
+    "/api/agent",
+    agentRoutes
 );
 
 module.exports = app;
