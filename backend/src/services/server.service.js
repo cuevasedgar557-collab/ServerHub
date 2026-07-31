@@ -36,7 +36,70 @@ async function getServers(userId) {
     return result.rows;
 }
 
+async function getServerById(userId, serverId) {
+
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM servers
+        WHERE id = $1
+        AND user_id = $2
+        `,
+        [serverId, userId]
+    );
+
+    return result.rows[0];
+}
+
+async function updateServer(userId, serverId, data) {
+
+    const { name, description, status } = data;
+
+    const result = await pool.query(
+        `
+        UPDATE servers
+        SET
+            name = $1,
+            description = $2,
+            status = $3,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $4
+        AND user_id = $5
+        RETURNING *
+        `,
+        [
+            name,
+            description,
+            status,
+            serverId,
+            userId
+        ]
+    );
+
+    return result.rows[0];
+}
+
+async function deleteServer(userId, serverId) {
+
+    const result = await pool.query(
+        `
+        DELETE FROM servers
+        WHERE id = $1
+        AND user_id = $2
+        RETURNING *
+        `,
+        [serverId, userId]
+    );
+
+    return result.rows[0];
+}
+
+
+
 module.exports = {
     createServer,
-    getServers
+    getServers,
+    getServerById,
+    updateServer,
+    deleteServer
 };

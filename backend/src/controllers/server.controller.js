@@ -62,9 +62,105 @@ async function getServers(req, res) {
 
     }
 }
+
+async function getServerById(req, res) {
+    try {
+
+        const server = await serverService.getServerById(
+            req.user.id,
+            req.params.id
+        );
+
+        if (!server) {
+            return res.status(404).json({
+                success: false,
+                message: "Servidor no encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            server
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
+async function updateServer(req, res) {
+    try {
+
+        const server = await serverService.updateServer(
+            req.user.id,
+            req.params.id,
+            req.body
+        );
+
+        if (!server) {
+            return res.status(404).json({
+                success: false,
+                message: "Servidor no encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            server
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
+async function deleteServer(req, res) {
+    try {
+
+        const server = await serverService.deleteServer(
+            req.user.id,
+            req.params.id
+        );
+
+        if (!server) {
+            return res.status(404).json({
+                success: false,
+                message: "Servidor no encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Servidor eliminado"
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
+
 module.exports = {
     getHealth,
     getServerInfo,
     createServer,
-    getServers
+    getServers,
+    getServerById,
+    updateServer,
+    deleteServer
 };
