@@ -25,6 +25,32 @@ async function registerAgent(req, res) {
     }
 }
 
+async function heartbeat(req, res) {
+
+    try {
+
+        const { agentToken } = req.body;
+
+        await agentService.heartbeat(
+            agentToken
+        );
+
+        res.json({
+            success: true,
+            message: "Heartbeat recibido"
+        });
+
+    } catch (error) {
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
 module.exports = {
-    registerAgent
+    registerAgent,
+    heartbeat
 };

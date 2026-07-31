@@ -69,6 +69,28 @@ async function registerAgent(data) {
     };
 }
 
+async function heartbeat(agentToken) {
+
+    const result = await pool.query(
+        `
+        UPDATE agents
+        SET last_seen = CURRENT_TIMESTAMP
+        WHERE agent_token = $1
+        RETURNING *
+        `,
+        [agentToken]
+    );
+
+    const agent = result.rows[0];
+
+    if (!agent) {
+        throw new Error("Agent token inválido");
+    }
+
+    return agent;
+}
+
 module.exports = {
-    registerAgent
+    registerAgent,
+    heartbeat
 };
