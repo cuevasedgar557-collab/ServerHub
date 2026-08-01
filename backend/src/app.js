@@ -7,6 +7,8 @@ const registrationKeyRoutes =
     require("./routes/registration-key.routes");
 const agentRoutes =
     require("./routes/agent.routes");
+const dashboardRoutes =
+    require("./routes/dashboard.routes");
 
 const app = express();
 
@@ -15,13 +17,8 @@ app.use(express.json());
 
 app.use("/api/server", serverRoutes);
 app.use("/api/auth", authRoutes);
-app.use(
-    "/api/registration-keys",
-    registrationKeyRoutes
-);
-app.use(
-    "/api/agent",
-    agentRoutes
-);
+app.use("/api/registration-keys", registrationKeyRoutes);
+app.use("/api/agent", agentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 module.exports = app;
