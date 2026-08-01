@@ -14,7 +14,8 @@ const {
     updateServer,
     deleteServer,
     getServerMetrics,
-    getLatestMetrics
+    getLatestMetrics,
+    getServerAgent
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -35,6 +36,12 @@ router.get(
     "/:id/latest",
     authenticate,
     getLatestMetrics
+);
+
+router.get(
+    "/:id/agent",
+    authenticate,
+    getServerAgent
 );
 
 router.get("/:id", authenticate, getServerById);

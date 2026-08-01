@@ -225,6 +225,50 @@ async function getLatestMetrics(userId, serverId) {
     };
 }
 
+async function getServerAgent(userId, serverId) {
+
+    const result = await pool.query(
+        `
+        SELECT
+            a.id,
+            a.version,
+            a.last_seen
+        FROM agents a
+        INNER JOIN servers s
+            ON s.id = a.server_id
+        WHERE s.id = $1
+        AND s.user_id = $2
+        `,
+        [serverId, userId]
+    );
+
+    const agent = result.rows[0];
+
+    if (!agent) {
+        throw new Error(
+            "Agente no encontrado"
+        );
+    }
+
+    let connectionStatus = "offline";
+
+    if (agent.last_seen) {
+
+        const diff =
+            Date.now() -
+            new Date(agent.last_seen).getTime();
+
+        if (diff <= 120000) {
+            connectionStatus = "online";
+        }
+    }
+
+    return {
+        ...agent,
+        connectionStatus
+    };
+}
+
 module.exports = {
     createServer,
     getServers,
@@ -232,5 +276,6 @@ module.exports = {
     updateServer,
     deleteServer,
     getServerMetrics,
-    getLatestMetrics
+    getLatestMetrics,
+    getServerAgent
 };

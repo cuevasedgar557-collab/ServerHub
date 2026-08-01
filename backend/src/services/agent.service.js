@@ -99,6 +99,30 @@ async function saveStats(data) {
         disk
     } = data;
 
+
+        if (
+            typeof cpu !== "number" ||
+            typeof ram !== "number" ||
+            typeof disk !== "number" ||
+            Number.isNaN(cpu) ||
+            Number.isNaN(ram) ||
+            Number.isNaN(disk)
+        ) {
+            throw new Error(
+                "CPU, RAM y Disco deben ser numéricos"
+            );
+        }
+
+        if (
+            cpu < 0 || cpu > 100 ||
+            ram < 0 || ram > 100 ||
+            disk < 0 || disk > 100
+        ) {
+            throw new Error(
+                "CPU, RAM y Disco deben estar entre 0 y 100"
+            );
+        }
+
     const agentResult = await pool.query(
         `
         SELECT id

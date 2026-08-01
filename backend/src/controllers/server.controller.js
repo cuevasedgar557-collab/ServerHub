@@ -203,6 +203,31 @@ async function getLatestMetrics(req, res) {
     }
 }
 
+async function getServerAgent(req, res) {
+
+    try {
+
+        const agent =
+            await serverService.getServerAgent(
+                req.user.id,
+                req.params.id
+            );
+
+        res.json({
+            success: true,
+            agent
+        });
+
+    } catch (error) {
+
+        res.status(404).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
 
 module.exports = {
     getHealth,
@@ -213,5 +238,6 @@ module.exports = {
     getServerById,
     updateServer,
     deleteServer,
-    getServerMetrics
+    getServerMetrics,
+    getServerAgent
 };
