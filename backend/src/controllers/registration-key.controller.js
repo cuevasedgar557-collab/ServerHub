@@ -7,7 +7,8 @@ async function createKey(req, res) {
 
         const key =
             await registrationKeyService.createKey(
-                req.user.id
+                req.user.id,
+                req.body.serverId
             );
 
         res.status(201).json({
@@ -24,7 +25,6 @@ async function createKey(req, res) {
 
     }
 }
-
 async function getKeys(req, res) {
 
     try {

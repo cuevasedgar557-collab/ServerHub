@@ -14,7 +14,7 @@ function generateKey() {
     return `SHUB-${part1}-${part2}`;
 }
 
-async function createKey(userId) {
+async function createKey(userId, serverId) {
 
     const registrationKey = generateKey();
 
@@ -29,14 +29,16 @@ async function createKey(userId) {
         INSERT INTO registration_keys
         (
             user_id,
+            server_id,
             registration_key,
             expires_at
         )
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
         `,
         [
             userId,
+            serverId,
             registrationKey,
             expiresAt
         ]

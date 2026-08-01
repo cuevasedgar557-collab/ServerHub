@@ -5,7 +5,6 @@ async function registerAgent(data) {
 
     const {
         registrationKey,
-        serverId,
         version
     } = data;
 
@@ -28,8 +27,19 @@ async function registerAgent(data) {
         throw new Error("Clave ya utilizada");
     }
 
-    if (new Date(key.expires_at) < new Date()) {
+    if (
+        new Date(key.expires_at) <
+        new Date()
+    ) {
         throw new Error("Clave expirada");
+    }
+
+    const serverId = key.server_id;
+
+    if (!serverId) {
+        throw new Error(
+            "La clave no está asociada a un servidor"
+        );
     }
 
     const agentToken =
