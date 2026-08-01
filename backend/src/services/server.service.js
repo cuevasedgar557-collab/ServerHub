@@ -160,11 +160,77 @@ async function getServerMetrics(userId, serverId) {
     return metricsResult.rows;
 }
 
+async function getLatestMetrics(userId, serverId) {
+
+    const serverResult = await pool.query(
+        `
+        SELECT
+            s.id,
+            s.name,
+            a.id AS agent_id,
+            a.last_seen
+        FROM servers s
+        LEFT JOIN agents a
+            ON a.server_id = s.id
+        WHERE s.id = $1
+        AND s.user_id = $2
+        `,
+        [serverId, userId]
+    );
+
+    const server = serverResult.rows[0];
+
+    if (!server) {
+        throw new Error("Servidor no encontrado");
+    }
+
+    const metricsResult = await pool.query(
+        `
+        SELECT
+            cpu_usage,
+            ram_usage,
+            disk_usage,
+            created_at
+        FROM server_metrics
+        WHERE agent_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1
+        `,
+        [server.agent_id]
+    );
+
+    const metrics = metricsResult.rows[0];
+
+    let connectionStatus = "offline";
+
+    if (server.last_seen) {
+
+        const diff =
+            Date.now() -
+            new Date(server.last_seen).getTime();
+
+        const twoMinutes = 2 * 60 * 1000;
+
+        if (diff <= twoMinutes) {
+            connectionStatus = "online";
+        }
+
+    }
+
+    return {
+        serverId: server.id,
+        serverName: server.name,
+        connectionStatus,
+        metrics: metrics || null
+    };
+}
+
 module.exports = {
     createServer,
     getServers,
     getServerById,
     updateServer,
     deleteServer,
-    getServerMetrics
+    getServerMetrics,
+    getLatestMetrics
 };

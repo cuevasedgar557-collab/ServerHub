@@ -13,7 +13,8 @@ const {
     getServerById,
     updateServer,
     deleteServer,
-    getServerMetrics
+    getServerMetrics,
+    getLatestMetrics
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -30,10 +31,17 @@ router.get(
     getServerMetrics
 );
 
+router.get(
+    "/:id/latest",
+    authenticate,
+    getLatestMetrics
+);
+
 router.get("/:id", authenticate, getServerById);
 
 router.put("/:id", authenticate, updateServer);
 
 router.delete("/:id", authenticate, deleteServer);
+
 
 module.exports = router;

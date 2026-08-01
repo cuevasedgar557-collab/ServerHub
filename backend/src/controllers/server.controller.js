@@ -178,10 +178,36 @@ async function getServerMetrics(req, res) {
     }
 }
 
+async function getLatestMetrics(req, res) {
+
+    try {
+
+        const data =
+            await serverService.getLatestMetrics(
+                req.user.id,
+                req.params.id
+            );
+
+        res.json({
+            success: true,
+            data
+        });
+
+    } catch (error) {
+
+        res.status(404).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+}
+
 
 module.exports = {
     getHealth,
     getServerInfo,
+    getLatestMetrics,
     createServer,
     getServers,
     getServerById,
