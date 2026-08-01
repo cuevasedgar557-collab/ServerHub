@@ -9,6 +9,8 @@ const agentRoutes =
     require("./routes/agent.routes");
 const dashboardRoutes =
     require("./routes/dashboard.routes");
+const healthRoutes =
+    require("./routes/health.routes");
 
 const app = express();
 
@@ -20,5 +22,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/registration-keys", registrationKeyRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/health", healthRoutes);
 
 module.exports = app;

@@ -60,12 +60,49 @@ async function getDashboard(userId) {
         [userId]
     );
 
+    const metricsResult = await pool.query(
+        `
+        SELECT
+            AVG(cpu_usage) AS avg_cpu,
+            AVG(ram_usage) AS avg_ram,
+            AVG(disk_usage) AS avg_disk
+        FROM server_metrics sm
+        INNER JOIN agents a
+            ON a.id = sm.agent_id
+        INNER JOIN servers s
+            ON s.id = a.server_id
+        WHERE s.user_id = $1
+        `,
+        [userId]
+    );
+
     return {
         totalServers: servers.length,
+
         onlineServers,
+
         offlineServers,
+
         totalAgents: Number(
             agentsResult.rows[0].total
+        ),
+
+        avgCpu: Number(
+            Number(
+                metricsResult.rows[0].avg_cpu || 0
+            ).toFixed(2)
+        ),
+
+        avgRam: Number(
+            Number(
+                metricsResult.rows[0].avg_ram || 0
+            ).toFixed(2)
+        ),
+
+        avgDisk: Number(
+            Number(
+                metricsResult.rows[0].avg_disk || 0
+            ).toFixed(2)
         )
     };
 }
