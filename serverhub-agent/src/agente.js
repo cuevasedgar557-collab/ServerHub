@@ -8,6 +8,10 @@ const {
     iniciarHeartbeat
 } = require("./services/heartbeat.service");
 
+const {
+    iniciarMetricas
+} = require("./services/stats.service");
+
 async function iniciarAgente() {
 
     try {
@@ -24,6 +28,7 @@ async function iniciarAgente() {
             );
 
             iniciarHeartbeat();
+            iniciarMetricas();
 
             return;
         }
