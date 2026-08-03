@@ -16,22 +16,50 @@ async function iniciarAgente() {
 
     try {
 
+        console.log("");
+        console.log(
+            `🚀 Iniciando ServerHub Agent v${config.version}`
+        );
+        console.log("");
+
+        console.log(
+            "✅ Configuración cargada"
+        );
+
         if (config.agentToken) {
 
             console.log(
-                "✅ Agente ya registrado"
+                "✅ Agente identificado"
             );
 
             console.log(
-                "Token:",
-                config.agentToken
+                `🔑 Token: ${config.agentToken}`
             );
 
             iniciarHeartbeat();
+
+            console.log(
+                `✅ Heartbeat iniciado (${config.heartbeatIntervalMs} ms)`
+            );
+
             iniciarMetricas();
+
+            console.log(
+                `✅ Recolección de métricas iniciada (${config.statsIntervalMs} ms)`
+            );
+
+            console.log("");
+            console.log(
+                "🟢 ServerHub Agent operativo"
+            );
+            console.log("");
 
             return;
         }
+
+        console.log(
+            "⚠️ Agente no registrado"
+        );
 
         const resultado = await registerAgent(
             "SHUB-9262-B556"
@@ -44,6 +72,22 @@ async function iniciarAgente() {
         console.log(resultado);
 
         iniciarHeartbeat();
+
+        console.log(
+            `✅ Heartbeat iniciado (${config.heartbeatIntervalMs} ms)`
+        );
+
+        iniciarMetricas();
+
+        console.log(
+            `✅ Recolección de métricas iniciada (${config.statsIntervalMs} ms)`
+        );
+
+        console.log("");
+        console.log(
+            "🟢 ServerHub Agent operativo"
+        );
+        console.log("");
 
     } catch (error) {
 
