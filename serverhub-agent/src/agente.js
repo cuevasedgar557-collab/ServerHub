@@ -12,6 +12,16 @@ const {
     iniciarMetricas
 } = require("./services/stats.service");
 
+const {
+    obtenerInformacionSistema
+} = require("./services/system.service");
+
+const {
+    enviarInformacionSistema
+} = require(
+    "./services/system-info.service"
+);
+
 async function iniciarAgente() {
 
     try {
@@ -26,6 +36,27 @@ async function iniciarAgente() {
             "✅ Configuración cargada"
         );
 
+        const sistema =
+    obtenerInformacionSistema(
+        config.version
+    );
+
+console.log(
+    `💻 Equipo: ${sistema.hostname}`
+);
+
+console.log(
+    `🖥️ Sistema: ${sistema.plataforma}`
+);
+
+console.log(
+    `⚙️ Arquitectura: ${sistema.arquitectura}`
+);
+
+console.log(
+    `⏱️ Tiempo encendido: ${sistema.tiempoEncendido}`
+);
+
         if (config.agentToken) {
 
             console.log(
@@ -36,6 +67,7 @@ async function iniciarAgente() {
                 `🔑 Token: ${config.agentToken}`
             );
 
+            await enviarInformacionSistema();
             iniciarHeartbeat();
 
             console.log(
@@ -71,6 +103,7 @@ async function iniciarAgente() {
 
         console.log(resultado);
 
+        await enviarInformacionSistema();
         iniciarHeartbeat();
 
         console.log(

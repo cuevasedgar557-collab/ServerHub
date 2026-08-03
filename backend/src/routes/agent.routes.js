@@ -5,7 +5,8 @@ const router = express.Router();
 const {
     registerAgent,
     heartbeat,
-    saveStats
+    saveStats,
+    saveSystemInfo
 } = require("../controllers/agent.controller");
 
 router.post(
@@ -21,6 +22,11 @@ router.post(
 router.post(
     "/stats",
     saveStats
+);
+
+router.post(
+    "/system-info",
+    saveSystemInfo
 );
 
 module.exports = router;

@@ -3,10 +3,13 @@ const pool = require("../config/db");
 
 async function registerAgent(data) {
 
-    const {
-        registrationKey,
-        version
-    } = data;
+const {
+    registrationKey,
+    version,
+    hostname,
+    operatingSystem,
+    architecture
+} = data;
 
     const keyResult = await pool.query(
         `
@@ -52,15 +55,21 @@ async function registerAgent(data) {
         (
             server_id,
             agent_token,
-            version
+            version,
+            hostname,
+            operating_system,
+            architecture
         )
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
         `,
         [
             serverId,
             agentToken,
-            version || "1.0.0"
+            version || "1.0.0",
+            hostname,
+            operatingSystem,
+            architecture
         ]
     );
 
@@ -171,8 +180,50 @@ async function saveStats(data) {
     return result.rows[0];
 }
 
+async function saveSystemInfo(data) {
+
+    const {
+        agentToken,
+        hostname,
+        operatingSystem,
+        architecture,
+        version
+    } = data;
+
+    const result = await pool.query(
+        `
+        UPDATE agents
+        SET
+            hostname = $1,
+            operating_system = $2,
+            architecture = $3,
+            version = $4
+        WHERE agent_token = $5
+        RETURNING *
+        `,
+        [
+            hostname,
+            operatingSystem,
+            architecture,
+            version,
+            agentToken
+        ]
+    );
+
+    const agent = result.rows[0];
+
+    if (!agent) {
+        throw new Error(
+            "Agent token inválido"
+        );
+    }
+
+    return agent;
+}
+
 module.exports = {
     registerAgent,
     heartbeat,
-    saveStats
+    saveStats,
+    saveSystemInfo
 };

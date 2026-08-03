@@ -1,6 +1,10 @@
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
+const {
+    obtenerInformacionSistema
+} = require("./system.service");
+
 
 const configPath = path.join(
     __dirname,
@@ -14,11 +18,19 @@ async function registerAgent(
     const config =
         require("../config/config.json");
 
+    const sistema =
+    obtenerInformacionSistema(
+        config.version
+    );
+
     const response = await axios.post(
         `${config.apiUrl}/api/agent/register`,
         {
             registrationKey,
-            version: "1.0.0"
+            version: config.version,
+            hostname: sistema.hostname,
+            operatingSystem: sistema.plataforma,
+            architecture: sistema.arquitectura
         }
     );
 

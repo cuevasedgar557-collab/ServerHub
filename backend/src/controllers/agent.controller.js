@@ -74,8 +74,35 @@ async function saveStats(req, res) {
     }
 }
 
+
+async function saveSystemInfo(req, res) {
+
+    try {
+
+        const agent =
+            await agentService.saveSystemInfo(
+                req.body
+            );
+
+        res.json({
+            success: true,
+            agent
+        });
+
+    } catch (error) {
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
 module.exports = {
     registerAgent,
     heartbeat,
-    saveStats
+    saveStats,
+    saveSystemInfo
 };
+
