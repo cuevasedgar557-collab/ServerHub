@@ -4,6 +4,7 @@ const path = require("path");
 const lockPath = path.join(
     __dirname,
     "..",
+    "runtime",
     "serverhub-agent.lock"
 );
 
