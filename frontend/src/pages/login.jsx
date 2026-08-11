@@ -1,74 +1,80 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { login } from "../services/authService";
+import AuthLayout from "../components/auth/AuthLayout";
+import Field from "../components/ui/Field";
+import Button from "../components/ui/Button";
 
 function Login() {
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function iniciarSesion() {
-  try {
+  async function iniciarSesion(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const datos = await login(
-      email,
-      password
-    );
+    try {
+      const datos = await login(email, password);
 
-    if (datos.success) {
-
-      localStorage.setItem(
-        "token",
-        datos.token
-      );
-      window.location.reload();
-      console.log("Login correcto");
-      console.log(datos.user);
-      console.log(datos.token);
-    } else {
-      console.log(datos.message);
+      if (datos.success) {
+        localStorage.setItem("token", datos.token);
+        navigate("/dashboard", { replace: true });
+      } else {
+        setError(datos.message || "No se pudo iniciar sesión");
+      }
+    } catch (error) {
+      console.error(error);
+      setError("No se pudo conectar con el servidor");
+    } finally {
+      setLoading(false);
     }
-
-  } catch (error) {
-    console.error(error);
   }
-}
 
   return (
-    <div>
-      <h1>ServerHub</h1>
+    <AuthLayout>
+      <form onSubmit={iniciarSesion} noValidate>
+        <p className="auth__eyebrow">Acceso</p>
+        <h2 className="auth__heading">Iniciar sesión</h2>
+        <p className="auth__sub">Entra para ver el estado de tus servidores.</p>
 
-      <h2>Iniciar Sesión</h2>
+        {error && (
+          <div className="sh-alert" role="alert">
+            {error}
+          </div>
+        )}
 
-      <div>
-        <label>Correo</label>
-        <br />
-
-        <input
+        <Field
+          label="Correo"
           type="email"
+          autoComplete="email"
+          required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-      </div>
 
-      <br />
-
-      <div>
-        <label>Contraseña</label>
-        <br />
-
-        <input
+        <Field
+          label="Contraseña"
           type="password"
+          autoComplete="current-password"
+          required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-      </div>
 
-      <br />
+        <Button type="submit" variant="primary" className="sh-btn--block" disabled={loading}>
+          {loading ? "Ingresando..." : "Ingresar"}
+        </Button>
 
-      <button onClick={iniciarSesion}>
-        Ingresar
-      </button>
-    </div>
+        <p className="auth__switch">
+          ¿No tienes cuenta? <Link to="/register">Crear cuenta</Link>
+        </p>
+      </form>
+    </AuthLayout>
   );
 }
 

@@ -1,0 +1,142 @@
+.auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) 1fr;
+}
+
+.auth__brand {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 48px;
+}
+
+.auth__brand-inner {
+  width: 100%;
+}
+
+.auth__logo {
+  font-size: 26px;
+}
+
+.auth__tagline {
+  color: var(--text-dim);
+  font-size: 14.5px;
+  line-height: 1.55;
+  margin: 14px 0 40px;
+  max-width: 30ch;
+}
+
+.auth__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth__eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--signal);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.auth__heading {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.auth__sub {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+.auth__switch {
+  margin-top: 24px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.auth__switch a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth__switch a:hover {
+  text-decoration: underline;
+}
+
+/* Elemento distintivo: lectura de estado de un rack, con datos simulados */
+.rack {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel-raised);
+}
+
+.rack__head {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--line);
+}
+
+.rack__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.rack__row:last-child {
+  border-bottom: none;
+}
+
+.rack__label {
+  display: flex;
+  align-items: center;
+  color: var(--text);
+}
+
+.rack__cpu {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 840px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth__brand {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 28px 24px;
+  }
+
+  .auth__tagline {
+    margin-bottom: 24px;
+    max-width: none;
+  }
+
+  .auth__panel {
+    padding: 32px 24px 48px;
+  }
+}

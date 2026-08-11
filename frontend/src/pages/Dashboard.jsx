@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getDashboard } from "../services/dashboardService";
+import Servers from "./Servers";
+
 
 function Dashboard() {
 
@@ -69,6 +71,10 @@ function Dashboard() {
       <button onClick={cerrarSesion}>
         Cerrar Sesión
       </button>
+
+      <hr />
+
+      <Servers />
 
     </div>
   );
