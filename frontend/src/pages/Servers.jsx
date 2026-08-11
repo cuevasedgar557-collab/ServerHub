@@ -1,56 +1,76 @@
 import { useEffect, useState } from "react";
 import { getServers } from "../services/serverService";
+import ServerCard from "../components/servers/ServerCard";
+import AddServerModal from "../components/servers/AddServerModal";
+import Button from "../components/ui/Button";
 
 function Servers() {
 
   const [servers, setServers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
+  async function cargarServidores() {
 
-    async function cargarServidores() {
+    try {
 
-      try {
+      const token = localStorage.getItem("token");
 
-        const token = localStorage.getItem("token");
+      const datos = await getServers(token);
 
-        const datos = await getServers(token);
+      setServers(datos.servers || []);
 
-        console.log(datos);
+    } catch (error) {
 
-        setServers(datos.servers);
+      console.error(error);
 
-      } catch (error) {
+    } finally {
 
-        console.error(error);
-
-      }
+      setLoading(false);
 
     }
+
+  }
+
+  useEffect(() => {
 
     cargarServidores();
 
   }, []);
 
   return (
-    <div>
-
-      <h2>Mis Servidores</h2>
-
-      {servers.map((server) => (
-        <div key={server.id}>
-
-          <p>ID: {server.id}</p>
-
-          <p>Nombre: {server.name}</p>
-
-          <p>Estado: {server.status}</p>
-
-          <hr />
-
+    <>
+      <div className="section__head">
+        <div>
+          <p className="section__eyebrow">Infraestructura</p>
+          <h2 className="section__title">Mis servidores</h2>
         </div>
-      ))}
 
-    </div>
+        <Button variant="primary" onClick={() => setShowModal(true)}>
+          Agregar servidor
+        </Button>
+      </div>
+
+      {!loading && servers.length === 0 && (
+        <div className="empty-state">
+          <strong>Aún no tienes servidores</strong>
+          Agrega tu primer VPS para empezar a monitorearlo.
+        </div>
+      )}
+
+      <div className="server-list">
+        {servers.map((server) => (
+          <ServerCard key={server.id} server={server} />
+        ))}
+      </div>
+
+      {showModal && (
+        <AddServerModal
+          onClose={() => setShowModal(false)}
+          onCreated={cargarServidores}
+        />
+      )}
+    </>
   );
 }
 

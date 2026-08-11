@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { getDashboard } from "../services/dashboardService";
+import AppShell from "../components/layout/AppShell";
+import StatCard from "../components/dashboard/StatCard";
 import Servers from "./Servers";
-
 
 function Dashboard() {
 
@@ -17,8 +18,6 @@ function Dashboard() {
 
         const datos = await getDashboard(token);
 
-        console.log(datos);
-
         setDashboard(datos.dashboard);
 
       } catch (error) {
@@ -33,50 +32,46 @@ function Dashboard() {
 
   }, []);
 
-  function cerrarSesion() {
-
-    localStorage.removeItem("token");
-
-    window.location.reload();
-
-  }
-
   return (
-    <div>
-
-      <h1>Dashboard</h1>
-
-      <p>Bienvenido a ServerHub</p>
+    <AppShell>
+      <section className="section">
+        <p className="section__eyebrow">Resumen</p>
+        <h2 className="section__title">Bienvenido a ServerHub</h2>
+      </section>
 
       {dashboard && (
-        <div>
-
-          <p>Total servidores: {dashboard.totalServers}</p>
-
-          <p>Online: {dashboard.onlineServers}</p>
-
-          <p>Offline: {dashboard.offlineServers}</p>
-
-          <p>Agentes: {dashboard.totalAgents}</p>
-
-          <p>CPU promedio: {dashboard.avgCpu}%</p>
-
-          <p>RAM promedio: {dashboard.avgRam}%</p>
-
-          <p>Disco promedio: {dashboard.avgDisk}%</p>
-
-        </div>
+        <section className="section">
+          <div className="stat-grid">
+            <StatCard label="Servidores" value={dashboard.totalServers} />
+            <StatCard label="En línea" value={dashboard.onlineServers} />
+            <StatCard label="Sin conexión" value={dashboard.offlineServers} />
+            <StatCard label="Agentes" value={dashboard.totalAgents} />
+            <StatCard
+              label="CPU promedio"
+              value={dashboard.avgCpu}
+              unit="%"
+              progress={dashboard.avgCpu}
+            />
+            <StatCard
+              label="RAM promedio"
+              value={dashboard.avgRam}
+              unit="%"
+              progress={dashboard.avgRam}
+            />
+            <StatCard
+              label="Disco promedio"
+              value={dashboard.avgDisk}
+              unit="%"
+              progress={dashboard.avgDisk}
+            />
+          </div>
+        </section>
       )}
 
-      <button onClick={cerrarSesion}>
-        Cerrar Sesión
-      </button>
-
-      <hr />
-
-      <Servers />
-
-    </div>
+      <section className="section">
+        <Servers />
+      </section>
+    </AppShell>
   );
 }
 
