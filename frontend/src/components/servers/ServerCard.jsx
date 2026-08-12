@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
 import StatusDot from "../ui/StatusDot";
+import Button from "../ui/Button";
 
-function ServerCard({ server }) {
+function ServerCard({ server, onEdit, onDelete }) {
   const online = server.connectionStatus === "online";
 
   return (
@@ -17,9 +19,25 @@ function ServerCard({ server }) {
         </div>
       </div>
 
-      <span className="server-card__status">
-        {online ? "En línea" : "Sin conexión"}
-      </span>
+      <div className="server-card__right">
+        <span className="server-card__status">
+          {online ? "En línea" : "Sin conexión"}
+        </span>
+
+        <div className="server-card__actions">
+          <Link className="server-card__link" to={`/servers/${server.id}`}>
+            Ver
+          </Link>
+
+          <Button variant="ghost" className="sh-btn--sm" onClick={onEdit}>
+            Editar
+          </Button>
+
+          <Button variant="ghost" className="sh-btn--sm" onClick={onDelete}>
+            Eliminar
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

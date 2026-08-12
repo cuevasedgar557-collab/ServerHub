@@ -252,6 +252,124 @@
   letter-spacing: 0.02em;
 }
 
+.server-card__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+}
+
+.server-card__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.server-card__link {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--signal);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  transition: border-color 0.15s ease;
+}
+
+.server-card__link:hover {
+  border-color: var(--signal);
+}
+
+/* Detalle de servidor */
+.back-link {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+
+.back-link:hover {
+  color: var(--signal);
+}
+
+.detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.detail-head__name {
+  display: flex;
+  align-items: center;
+  font-size: 26px;
+  margin-top: 4px;
+}
+
+.detail-head__desc {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* Gráfico de métricas (sparkline) */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.metric-chart {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.metric-chart__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.metric-chart__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.metric-chart__current {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.metric-chart__svg {
+  width: 100%;
+  height: 64px;
+  display: block;
+}
+
+.metric-chart__area {
+  fill: var(--signal-dim);
+  stroke: none;
+}
+
+.metric-chart__line {
+  stroke: var(--signal);
+  stroke-width: 2;
+  fill: none;
+}
+
+.metric-chart__empty {
+  color: var(--text-faint);
+  font-size: 13px;
+}
+
 @media (max-width: 640px) {
   .shell__content {
     padding: 24px 16px 48px;
