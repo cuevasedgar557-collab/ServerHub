@@ -35,9 +35,13 @@ async function registerAgent(
     );
 
     const agentToken =
-        response.data.agentToken;
+    response.data.agentToken;
+
+    const agentSecret =
+    response.data.agentSecret;
 
     config.agentToken = agentToken;
+    config.agentSecret = agentSecret;
 
     fs.writeFileSync(
         configPath,

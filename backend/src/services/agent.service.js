@@ -46,8 +46,11 @@ const {
     }
 
     const agentToken =
-        "agt_" +
-        crypto.randomBytes(16).toString("hex");
+    "agt_" +
+    crypto.randomBytes(16).toString("hex");
+
+const agentSecret =
+    crypto.randomBytes(32).toString("hex");
 
     const agentResult = await pool.query(
         `
@@ -55,17 +58,19 @@ const {
         (
             server_id,
             agent_token,
+            agent_secret,
             version,
             hostname,
             operating_system,
             architecture
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
         `,
         [
             serverId,
             agentToken,
+            agentSecret,
             version || "1.0.0",
             hostname,
             operatingSystem,
@@ -84,7 +89,8 @@ const {
 
     return {
         agentId: agentResult.rows[0].id,
-        agentToken
+        agentToken,
+        agentSecret
     };
 }
 

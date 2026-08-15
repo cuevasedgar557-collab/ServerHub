@@ -94,7 +94,7 @@ console.log(
         );
 
         const resultado = await registerAgent(
-            "SHUB-9262-B556"
+            "SHUB-E9D3-CA89"
         );
 
         console.log(
