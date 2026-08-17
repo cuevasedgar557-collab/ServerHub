@@ -51,6 +51,11 @@ const {
 
 const agentSecret =
     crypto.randomBytes(32).toString("hex");
+const tokenExpiresAt =
+    new Date(
+        Date.now() +
+        90 * 24 * 60 * 60 * 1000
+    );
 
     const agentResult = await pool.query(
         `
@@ -59,18 +64,20 @@ const agentSecret =
             server_id,
             agent_token,
             agent_secret,
+            token_expires_at,
             version,
             hostname,
             operating_system,
             architecture
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
         `,
         [
             serverId,
             agentToken,
             agentSecret,
+            tokenExpiresAt,
             version || "1.0.0",
             hostname,
             operatingSystem,
@@ -214,9 +221,70 @@ async function saveSystemInfo(
     return agent;
 }
 
+async function refreshToken(agentId) {
+
+    const crypto = require("crypto");
+
+    const newToken =
+        "agt_" +
+        crypto.randomBytes(16).toString("hex");
+
+    const newSecret =
+        crypto.randomBytes(32).toString("hex");
+
+    const tokenExpiresAt =
+        new Date(
+            Date.now() +
+            90 * 24 * 60 * 60 * 1000
+        );
+
+    const result = await pool.query(
+        `
+        UPDATE agents
+        SET
+            agent_token = $1,
+            agent_secret = $2,
+            token_expires_at = $3
+        WHERE id = $4
+        RETURNING *
+        `,
+        [
+            newToken,
+            newSecret,
+            tokenExpiresAt,
+            agentId
+        ]
+    );
+
+    return {
+        agentToken: newToken,
+        agentSecret: newSecret,
+        expiresAt: tokenExpiresAt
+    };
+
+}
+
+async function getTokenInfo(agentId) {
+
+    const result = await pool.query(
+        `
+        SELECT
+            token_expires_at
+        FROM agents
+        WHERE id = $1
+        `,
+        [agentId]
+    );
+
+    return result.rows[0];
+
+}
+
 module.exports = {
     registerAgent,
     heartbeat,
     saveStats,
-    saveSystemInfo
+    saveSystemInfo,
+    refreshToken,
+    getTokenInfo
 };

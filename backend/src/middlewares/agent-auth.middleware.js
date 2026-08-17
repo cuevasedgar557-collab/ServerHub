@@ -43,15 +43,30 @@ async function authenticateAgent(
 
         const agent = result.rows[0];
 
-        if (!agent) {
+if (!agent) {
 
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Agent token inválido"
-            });
+    return res.status(401).json({
+        success: false,
+        message:
+            "Agent token inválido"
+    });
 
-        }
+}
+
+if (
+    agent.token_expires_at &&
+    new Date(
+        agent.token_expires_at
+    ) < new Date()
+) {
+
+    return res.status(401).json({
+        success: false,
+        message:
+            "Token expirado"
+    });
+
+}
 
         const payload =
             JSON.stringify(req.body);

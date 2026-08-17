@@ -101,10 +101,62 @@ async function saveSystemInfo(req, res) {
     }
 
 }
+
+async function refreshToken(req, res) {
+
+    try {
+
+        const result =
+            await agentService.refreshToken(
+                req.agent.id
+            );
+
+        res.json({
+            success: true,
+            ...result
+        });
+
+    } catch (error) {
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function getTokenInfo(req, res) {
+
+    try {
+
+        const info =
+            await agentService.getTokenInfo(
+                req.agent.id
+            );
+
+        res.json({
+            success: true,
+            ...info
+        });
+
+    } catch (error) {
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
 module.exports = {
     registerAgent,
     heartbeat,
     saveStats,
-    saveSystemInfo
+    saveSystemInfo,
+    refreshToken,
+    getTokenInfo
 };
 

@@ -22,6 +22,12 @@ const {
     "./services/system-info.service"
 );
 
+const {
+    iniciarMonitorToken
+} = require(
+    "./services/token-monitor.service"
+);
+
 async function iniciarAgente() {
 
     try {
@@ -68,6 +74,9 @@ console.log(
             );
 
             await enviarInformacionSistema();
+
+            iniciarMonitorToken();
+            
             iniciarHeartbeat();
 
             console.log(
