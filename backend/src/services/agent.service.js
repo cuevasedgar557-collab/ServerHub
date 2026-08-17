@@ -1,6 +1,10 @@
 const crypto = require("crypto");
 const pool = require("../config/db");
 
+const {
+    createAuditLog
+} = require("./audit.service");
+
 async function registerAgent(data) {
 
 const {
@@ -93,6 +97,26 @@ const tokenExpiresAt =
         `,
         [key.id]
     );
+
+
+    await createAuditLog(
+    "AGENT_REGISTERED",
+    {
+        agentId:
+            agentResult.rows[0].id,
+
+        serverId,
+
+        hostname,
+
+        operatingSystem,
+
+        architecture,
+
+        version:
+            version || "1.0.0"
+    }
+);
 
     return {
         agentId: agentResult.rows[0].id,
