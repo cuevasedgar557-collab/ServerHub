@@ -115,52 +115,35 @@ async function heartbeat(agentToken) {
     return agent;
 }
 
-async function saveStats(data) {
+async function saveStats(agentId, data) {
 
     const {
-        agentToken,
         cpu,
         ram,
         disk
     } = data;
 
+    if (
+        typeof cpu !== "number" ||
+        typeof ram !== "number" ||
+        typeof disk !== "number" ||
+        Number.isNaN(cpu) ||
+        Number.isNaN(ram) ||
+        Number.isNaN(disk)
+    ) {
+        throw new Error(
+            "CPU, RAM y Disco deben ser numéricos"
+        );
+    }
 
-        if (
-            typeof cpu !== "number" ||
-            typeof ram !== "number" ||
-            typeof disk !== "number" ||
-            Number.isNaN(cpu) ||
-            Number.isNaN(ram) ||
-            Number.isNaN(disk)
-        ) {
-            throw new Error(
-                "CPU, RAM y Disco deben ser numéricos"
-            );
-        }
-
-        if (
-            cpu < 0 || cpu > 100 ||
-            ram < 0 || ram > 100 ||
-            disk < 0 || disk > 100
-        ) {
-            throw new Error(
-                "CPU, RAM y Disco deben estar entre 0 y 100"
-            );
-        }
-
-    const agentResult = await pool.query(
-        `
-        SELECT id
-        FROM agents
-        WHERE agent_token = $1
-        `,
-        [agentToken]
-    );
-
-    const agent = agentResult.rows[0];
-
-    if (!agent) {
-        throw new Error("Agent token inválido");
+    if (
+        cpu < 0 || cpu > 100 ||
+        ram < 0 || ram > 100 ||
+        disk < 0 || disk > 100
+    ) {
+        throw new Error(
+            "CPU, RAM y Disco deben estar entre 0 y 100"
+        );
     }
 
     const result = await pool.query(
@@ -176,7 +159,7 @@ async function saveStats(data) {
         RETURNING *
         `,
         [
-            agent.id,
+            agentId,
             cpu,
             ram,
             disk
@@ -186,10 +169,12 @@ async function saveStats(data) {
     return result.rows[0];
 }
 
-async function saveSystemInfo(data) {
+async function saveSystemInfo(
+    agentId,
+    data
+) {
 
     const {
-        agentToken,
         hostname,
         operatingSystem,
         architecture,
@@ -204,7 +189,7 @@ async function saveSystemInfo(data) {
             operating_system = $2,
             architecture = $3,
             version = $4
-        WHERE agent_token = $5
+        WHERE id = $5
         RETURNING *
         `,
         [
@@ -212,16 +197,18 @@ async function saveSystemInfo(data) {
             operatingSystem,
             architecture,
             version,
-            agentToken
+            agentId
         ]
     );
 
     const agent = result.rows[0];
 
     if (!agent) {
+
         throw new Error(
-            "Agent token inválido"
+            "Agente no encontrado"
         );
+
     }
 
     return agent;

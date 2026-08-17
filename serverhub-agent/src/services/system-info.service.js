@@ -1,6 +1,8 @@
 const axios = require("axios");
 
 const config = require("../config/config.json");
+const { generarFirma } =
+    require("../utils/signature");
 
 const {
     obtenerInformacionSistema
@@ -15,16 +17,35 @@ async function enviarInformacionSistema() {
                 config.version
             );
 
-        await axios.post(
-            `${config.apiUrl}/api/agent/system-info`,
-            {
-                agentToken: config.agentToken,
-                hostname: sistema.hostname,
-                operatingSystem: sistema.plataforma,
-                architecture: sistema.arquitectura,
-                version: config.version
-            }
-        );
+        const payload = {
+    hostname: sistema.hostname,
+    operatingSystem:
+        sistema.plataforma,
+    architecture:
+        sistema.arquitectura,
+    version:
+        config.version,
+    timestamp:
+        Date.now()
+};
+
+const firma = generarFirma(
+    JSON.stringify(payload),
+    config.agentSecret
+);
+
+await axios.post(
+    `${config.apiUrl}/api/agent/system-info`,
+    payload,
+    {
+        headers: {
+            "X-Agent-Token":
+                config.agentToken,
+            "X-Agent-Signature":
+                firma
+        }
+    }
+);
 
         console.log(
             "💻 Información del sistema enviada"

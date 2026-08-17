@@ -1,6 +1,11 @@
 const express = require("express");
 
 const router = express.Router();
+const {
+    authenticateAgent
+} = require(
+    "../middlewares/agent-auth.middleware"
+);
 
 const {
     registerAgent,
@@ -16,16 +21,19 @@ router.post(
 
 router.post(
     "/heartbeat",
+    authenticateAgent,
     heartbeat
 );
 
 router.post(
     "/stats",
+    authenticateAgent,
     saveStats
 );
 
 router.post(
     "/system-info",
+    authenticateAgent,
     saveSystemInfo
 );
 

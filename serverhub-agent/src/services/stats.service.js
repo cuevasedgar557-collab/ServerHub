@@ -2,6 +2,8 @@ const axios = require("axios");
 const si = require("systeminformation");
 
 const config = require("../config/config.json");
+const { generarFirma } =
+    require("../utils/signature");
 
 async function obtenerMetricas() {
 
@@ -39,15 +41,28 @@ async function enviarMetricas() {
         const metricas =
             await obtenerMetricas();
 
-        await axios.post(
-            `${config.apiUrl}/api/agent/stats`,
-            {
-                agentToken:
-                    config.agentToken,
+        const payload = {
+    ...metricas,
+    timestamp: Date.now()
+};
 
-                ...metricas
-            }
-        );
+const firma = generarFirma(
+    JSON.stringify(payload),
+    config.agentSecret
+);
+
+await axios.post(
+    `${config.apiUrl}/api/agent/stats`,
+    payload,
+    {
+        headers: {
+            "X-Agent-Token":
+                config.agentToken,
+            "X-Agent-Signature":
+                firma
+        }
+    }
+);
 
         console.log(
             "📊 Métricas enviadas",

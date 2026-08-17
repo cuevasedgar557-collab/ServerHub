@@ -1,30 +1,43 @@
 const axios = require("axios");
 const config = require("../config/config.json");
+const { generarFirma } = require("../utils/signature");
 
 async function enviarHeartbeat() {
-
     try {
+
+        const payload = {
+            timestamp: Date.now()
+        };
+
+        const firma = generarFirma(
+            JSON.stringify(payload),
+            config.agentSecret
+        );
 
         await axios.post(
             `${config.apiUrl}/api/agent/heartbeat`,
+            payload,
             {
-                agentToken: config.agentToken
+                headers: {
+                    "X-Agent-Token":
+                        config.agentToken,
+                    "X-Agent-Signature":
+                        firma
+                }
             }
         );
 
-        console.log(
-            "💓 Heartbeat enviado"
-        );
+        console.log("💓 Heartbeat enviado");
 
     } catch (error) {
 
         console.error(
             "❌ Error enviando heartbeat:",
-            error.response?.data || error.message
+            error.response?.data ||
+            error.message
         );
 
     }
-
 }
 
 function iniciarHeartbeat() {

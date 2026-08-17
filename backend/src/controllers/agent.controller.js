@@ -29,10 +29,8 @@ async function heartbeat(req, res) {
 
     try {
 
-        const { agentToken } = req.body;
-
         await agentService.heartbeat(
-            agentToken
+            req.agent.agent_token
         );
 
         res.json({
@@ -48,14 +46,15 @@ async function heartbeat(req, res) {
         });
 
     }
-}
 
-async function saveStats(req, res) {
+}
+    async function saveStats(req, res) {
 
     try {
 
         const stats =
             await agentService.saveStats(
+                req.agent.id,
                 req.body
             );
 
@@ -72,7 +71,9 @@ async function saveStats(req, res) {
         });
 
     }
+
 }
+
 
 
 async function saveSystemInfo(req, res) {
@@ -81,6 +82,7 @@ async function saveSystemInfo(req, res) {
 
         const agent =
             await agentService.saveSystemInfo(
+                req.agent.id,
                 req.body
             );
 
