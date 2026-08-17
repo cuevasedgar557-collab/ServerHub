@@ -1,12 +1,18 @@
 const axios = require("axios");
 const config = require("../config/config.json");
 const { generarFirma } = require("../utils/signature");
+const {
+    generarNonce
+} = require(
+    "../utils/nonce"
+);
 
 async function enviarHeartbeat() {
     try {
 
         const payload = {
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            nonce: generarNonce()
         };
 
         const firma = generarFirma(

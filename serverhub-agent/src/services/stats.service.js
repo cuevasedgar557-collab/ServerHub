@@ -5,6 +5,12 @@ const config = require("../config/config.json");
 const { generarFirma } =
     require("../utils/signature");
 
+const {
+    generarNonce
+} = require(
+    "../utils/nonce"
+);
+
 async function obtenerMetricas() {
 
     const cargaCpu = await si.currentLoad();
@@ -43,7 +49,8 @@ async function enviarMetricas() {
 
         const payload = {
     ...metricas,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    nonce: generarNonce()
 };
 
 const firma = generarFirma(

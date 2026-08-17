@@ -1,5 +1,11 @@
 const crypto = require("crypto");
 const pool = require("../config/db");
+const {
+    isNonceUsed,
+    saveNonce
+} = require(
+    "../utils/nonce-store"
+);
 
 async function authenticateAgent(
     req,
@@ -69,10 +75,59 @@ async function authenticateAgent(
                     "Firma inválida"
             });
         }
+        const timestamp = req.body.timestamp;
 
-        req.agent = agent;
+if (
+    typeof timestamp !== "number"
+) {
+    return res.status(401).json({
+        success: false,
+        message: "Timestamp requerido"
+    });
+}
 
-        next();
+const now = Date.now();
+
+const maxDifference = 30000;
+
+const difference = Math.abs(
+    now - timestamp
+);
+
+if (difference > maxDifference) {
+
+    return res.status(401).json({
+        success: false,
+        message: "Petición expirada"
+    });
+
+}
+
+const nonce = req.body.nonce;
+
+if (
+    typeof nonce !== "string"
+) {
+    return res.status(401).json({
+        success: false,
+        message: "Nonce requerido"
+    });
+}
+
+if (isNonceUsed(nonce)) {
+
+    return res.status(401).json({
+        success: false,
+        message: "Petición duplicada"
+    });
+
+}
+
+saveNonce(nonce);
+
+req.agent = agent;
+
+next();
 
     } catch (error) {
 

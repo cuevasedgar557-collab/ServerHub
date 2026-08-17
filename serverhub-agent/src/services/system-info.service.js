@@ -8,6 +8,12 @@ const {
     obtenerInformacionSistema
 } = require("./system.service");
 
+const {
+    generarNonce
+} = require(
+    "../utils/nonce"
+);
+
 async function enviarInformacionSistema() {
 
     try {
@@ -26,7 +32,8 @@ async function enviarInformacionSistema() {
     version:
         config.version,
     timestamp:
-        Date.now()
+        Date.now(),
+        nonce: generarNonce()
 };
 
 const firma = generarFirma(
