@@ -24,6 +24,7 @@ const {
         [registrationKey]
     );
 
+
     const key = keyResult.rows[0];
 
     if (!key) {
@@ -97,6 +98,26 @@ const tokenExpiresAt =
         `,
         [key.id]
     );
+
+    console.log(
+    "AUDIT: REGISTRATION_KEY_USED"
+);
+
+        await createAuditLog(
+    "REGISTRATION_KEY_USED",
+    {
+        registrationKey:
+            registrationKey,
+
+        registrationKeyId:
+            key.id,
+
+        serverId,
+
+        agentId:
+            agentResult.rows[0].id
+    }
+);
 
 
     await createAuditLog(
@@ -279,7 +300,14 @@ async function refreshToken(agentId) {
             agentId
         ]
     );
-
+    await createAuditLog(
+    "AGENT_TOKEN_REFRESHED",
+    {
+        agentId,
+        newToken,
+        expiresAt: tokenExpiresAt
+    }
+);
     return {
         agentToken: newToken,
         agentSecret: newSecret,

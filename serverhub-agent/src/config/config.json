@@ -1,7 +1,7 @@
 {
     "apiUrl": "http://localhost:3000",
-    "agentToken": "agt_9cafec7165785aa032edd9359d5df5c7",
-    "agentSecret": "d272557b47e94eb4cf8086375261add22dd662df3b927e7d3cc33ec93be93ddf",
+    "agentToken": "agt_f87c04d3f29b8d2b9fba0c4c79b4c174",
+    "agentSecret": "23f8f2d4d5112ece7df3a6e242e84b12e6e2b58f67b658b8c1c3baacd0393c58",
     "heartbeatIntervalMs": 10000,
     "statsIntervalMs": 10000,
     "version": "1.0.0"
