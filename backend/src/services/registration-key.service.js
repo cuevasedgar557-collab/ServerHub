@@ -1,5 +1,8 @@
 const crypto = require("crypto");
 const pool = require("../config/db");
+const {
+    createAuditLog
+} = require("./audit.service");
 
 function generateKey() {
 
@@ -43,6 +46,15 @@ async function createKey(userId, serverId) {
             expiresAt
         ]
     );
+
+    await createAuditLog(
+    "REGISTRATION_KEY_CREATED",
+    {
+        registrationKey,
+        serverId,
+        expiresAt
+    }
+);
 
     return result.rows[0];
 }

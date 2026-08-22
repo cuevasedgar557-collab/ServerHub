@@ -6,6 +6,11 @@ const {
 } = require(
     "../utils/nonce"
 );
+const {
+    decommissionAgent
+} = require(
+    "./decommission.service"
+);
 
 async function enviarHeartbeat() {
     try {
@@ -42,6 +47,18 @@ async function enviarHeartbeat() {
             error.response?.data ||
             error.message
         );
+
+        const response =
+    error.response?.data;
+
+if (
+    response?.message ===
+    "Agent token inválido"
+) {
+
+    decommissionAgent();
+
+}
 
     }
 }

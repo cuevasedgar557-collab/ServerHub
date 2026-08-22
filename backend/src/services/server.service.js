@@ -1,5 +1,9 @@
 const pool = require("../config/db");
 
+const {
+    createAuditLog
+} = require("./audit.service");
+
 async function createServer(userId, data) {
 
     const { name, description } = data;
@@ -17,6 +21,20 @@ async function createServer(userId, data) {
         `,
         [userId, name, description]
     );
+
+    await createAuditLog(
+    "SERVER_CREATED",
+    {
+        serverId:
+            result.rows[0].id,
+
+        userId,
+
+        name,
+
+        description
+    }
+);
 
     return result.rows[0];
 }
@@ -105,19 +123,67 @@ async function updateServer(userId, serverId, data) {
     return result.rows[0];
 }
 
-async function deleteServer(userId, serverId) {
+async function deleteServer(
+    userId,
+    serverId
+) {
 
-    const result = await pool.query(
+    const serverResult =
+        await pool.query(
+            `
+            SELECT *
+            FROM servers
+            WHERE id = $1
+            AND user_id = $2
+            `,
+            [
+                serverId,
+                userId
+            ]
+        );
+
+    const server =
+        serverResult.rows[0];
+
+    if (!server) {
+
+        throw new Error(
+            "Servidor no encontrado"
+        );
+
+    }
+
+    await pool.query(
+        `
+        DELETE FROM agents
+        WHERE server_id = $1
+        `,
+        [serverId]
+    );
+
+    await pool.query(
         `
         DELETE FROM servers
         WHERE id = $1
         AND user_id = $2
-        RETURNING *
         `,
-        [serverId, userId]
+        [
+            serverId,
+            userId
+        ]
     );
 
-    return result.rows[0];
+    await createAuditLog(
+        "SERVER_DELETED",
+        {
+            serverId,
+            userId,
+            name: server.name
+        }
+    );
+
+    return server;
+
 }
 
 async function getServerMetrics(userId, serverId) {

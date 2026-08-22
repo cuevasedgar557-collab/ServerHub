@@ -99,9 +99,6 @@ const tokenExpiresAt =
         [key.id]
     );
 
-    console.log(
-    "AUDIT: REGISTRATION_KEY_USED"
-);
 
         await createAuditLog(
     "REGISTRATION_KEY_USED",

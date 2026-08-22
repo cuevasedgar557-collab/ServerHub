@@ -66,6 +66,18 @@ await axios.post(
             error.message
         );
 
+        const response =
+    error.response?.data;
+
+if (
+    response?.message ===
+    "Agent token inválido"
+) {
+
+    decommissionAgent();
+
+}
+
     }
 
 }
