@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getServers, deleteServer } from "../services/serverService";
+import { getServers, deleteServer, verifyServerPassword } from "../services/serverService";
 import ServerCard from "../components/servers/ServerCard";
 import AddServerModal from "../components/servers/AddServerModal";
 import EditServerModal from "../components/servers/EditServerModal";
@@ -14,6 +14,7 @@ function Servers() {
   const [editingServer, setEditingServer] = useState(null);
   const [deletingServer, setDeletingServer] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   async function cargarServidores() {
 
@@ -43,13 +44,25 @@ function Servers() {
 
   }, []);
 
-  async function confirmarEliminar() {
+  async function confirmarEliminar(password) {
 
     setDeleting(true);
+    setDeleteError("");
 
     try {
 
       const token = localStorage.getItem("token");
+
+      const verificacion = await verifyServerPassword(
+        token,
+        deletingServer.id,
+        password
+      );
+
+      if (!verificacion.success) {
+        setDeleteError("Clave administrativa incorrecta");
+        return;
+      }
 
       await deleteServer(token, deletingServer.id);
 
@@ -60,6 +73,7 @@ function Servers() {
     } catch (error) {
 
       console.error(error);
+      setDeleteError("No se pudo conectar con el servidor");
 
     } finally {
 
@@ -121,6 +135,8 @@ function Servers() {
           message={`¿Seguro que quieres eliminar "${deletingServer.name}"? Esta acción no se puede deshacer.`}
           confirmLabel="Eliminar"
           loading={deleting}
+          requirePassword
+          passwordError={deleteError}
           onCancel={() => setDeletingServer(null)}
           onConfirm={confirmarEliminar}
         />

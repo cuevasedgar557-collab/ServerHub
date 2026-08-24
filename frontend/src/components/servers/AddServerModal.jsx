@@ -7,6 +7,7 @@ import Button from "../ui/Button";
 function AddServerModal({ onClose, onCreated }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [registrationKey, setRegistrationKey] = useState(null);
@@ -19,7 +20,7 @@ function AddServerModal({ onClose, onCreated }) {
 
     try {
       const token = localStorage.getItem("token");
-      const datos = await createServer(token, { name, description });
+      const datos = await createServer(token, { name, description, adminPassword });
 
       if (!datos.success) {
         setError(datos.message || "No se pudo crear el servidor");
@@ -84,6 +85,17 @@ function AddServerModal({ onClose, onCreated }) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
+
+              <Field
+                label="Clave administrativa"
+                type="password"
+                required
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+              />
+              <p className="modal__hint">
+                Esta clave protege acciones administrativas sobre el servidor. Guárdala en un lugar seguro.
+              </p>
 
               <div className="modal__actions">
                 <Button type="button" variant="ghost" onClick={onClose}>

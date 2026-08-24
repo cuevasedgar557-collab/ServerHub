@@ -6,10 +6,12 @@ import {
   getServerMetrics,
   getLatestMetrics
 } from "../services/serverService";
+import { createRegistrationKey } from "../services/registrationKeyService";
 import AppShell from "../components/layout/AppShell";
 import StatusDot from "../components/ui/StatusDot";
 import StatCard from "../components/dashboard/StatCard";
 import MetricsChart from "../components/servers/MetricsChart";
+import Button from "../components/ui/Button";
 
 function ServerDetail() {
   const { id } = useParams();
@@ -19,6 +21,11 @@ function ServerDetail() {
   const [latest, setLatest] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [registrationKey, setRegistrationKey] = useState(null);
+  const [generatingKey, setGeneratingKey] = useState(false);
+  const [keyError, setKeyError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
 
@@ -56,6 +63,43 @@ function ServerDetail() {
     cargar();
 
   }, [id]);
+
+  async function regenerarClave() {
+
+    setGeneratingKey(true);
+    setKeyError("");
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const datos = await createRegistrationKey(token, id);
+
+      if (datos.success) {
+        setRegistrationKey(datos.key.registration_key);
+        setCopied(false);
+      } else {
+        setKeyError(datos.message || "No se pudo generar la clave");
+      }
+
+    } catch (error) {
+
+      console.error(error);
+      setKeyError("No se pudo conectar con el servidor");
+
+    } finally {
+
+      setGeneratingKey(false);
+
+    }
+
+  }
+
+  function copiarClave() {
+    navigator.clipboard.writeText(registrationKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   const online = latest?.connectionStatus === "online";
   const latestMetrics = latest?.metrics;
@@ -133,6 +177,45 @@ function ServerDetail() {
               />
             </div>
           </section>
+
+          {!agent && (
+            <section className="section">
+              <div className="section__head">
+                <div>
+                  <p className="section__eyebrow">Vinculación</p>
+                  <h2 className="section__title">Agente</h2>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  onClick={regenerarClave}
+                  disabled={generatingKey}
+                >
+                  {generatingKey ? "Generando..." : "Generar clave de vinculación"}
+                </Button>
+              </div>
+
+              {keyError && (
+                <div className="sh-alert" role="alert">
+                  {keyError}
+                </div>
+              )}
+
+              {registrationKey && (
+                <>
+                  <p className="modal__sub">
+                    Usa esta clave para vincular el agente. Vence en 24 horas.
+                  </p>
+                  <div className="key-box">
+                    <span className="key-box__value">{registrationKey}</span>
+                    <Button type="button" variant="ghost" onClick={copiarClave}>
+                      {copied ? "Copiado" : "Copiar"}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </section>
+          )}
 
           <section className="section">
             <p className="section__eyebrow">Historial reciente</p>

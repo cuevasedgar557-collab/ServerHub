@@ -71,6 +71,40 @@
   outline: none;
 }
 
+.sh-field__wrap {
+  position: relative;
+}
+
+.sh-field__input--password {
+  padding-right: 40px;
+}
+
+.sh-field__toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.sh-field__toggle:hover {
+  color: var(--signal);
+}
+
+.sh-field__toggle:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .sh-field__error {
   display: block;
   margin-top: 6px;

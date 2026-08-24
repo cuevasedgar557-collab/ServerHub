@@ -19,6 +19,31 @@ function generateKey() {
 
 async function createKey(userId, serverId) {
 
+    const agentResult = await pool.query(
+        `
+        SELECT id
+        FROM agents
+        WHERE server_id = $1
+        `,
+        [serverId]
+    );
+
+    if (agentResult.rows.length > 0) {
+        throw new Error(
+            "Este servidor ya tiene un agente vinculado"
+        );
+    }
+
+    await pool.query(
+        `
+        UPDATE registration_keys
+        SET is_used = true
+        WHERE server_id = $1
+        AND is_used = false
+        `,
+        [serverId]
+    );
+
     const registrationKey = generateKey();
 
     const expiresAt = new Date();

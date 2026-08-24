@@ -118,3 +118,21 @@ export async function getLatestMetrics(token, id) {
 
   return await respuesta.json();
 }
+
+
+export async function verifyServerPassword(token, id, password) {
+
+  const respuesta = await fetch(
+    `${API_URL}/api/server/${id}/verify-password`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ password })
+    }
+  );
+
+  return await respuesta.json();
+}
