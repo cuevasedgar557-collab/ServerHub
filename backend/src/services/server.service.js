@@ -1,50 +1,91 @@
 const pool = require("../config/db");
 
+const bcrypt = require("bcrypt");
+
 const {
     createAuditLog
 } = require("./audit.service");
 
 async function createServer(userId, data) {
 
-    const { name, description } = data;
+    const {
+        name,
+        description,
+        adminPassword
+    } = data;
 
     if (!name) {
-        throw new Error("El nombre del servidor es obligatorio");
+        throw new Error(
+            "El nombre del servidor es obligatorio"
+        );
     }
+
+    if (!adminPassword) {
+        throw new Error(
+            "La clave administrativa es obligatoria"
+        );
+    }
+
+    const passwordHash =
+        await bcrypt.hash(
+            adminPassword,
+            12
+        );
 
     const result = await pool.query(
         `
         INSERT INTO servers
-        (user_id, name, description)
-        VALUES ($1, $2, $3)
+        (
+            user_id,
+            name,
+            description,
+            admin_password_hash
+        )
+        VALUES ($1, $2, $3, $4)
         RETURNING *
         `,
-        [userId, name, description]
+        [
+            userId,
+            name,
+            description,
+            passwordHash
+        ]
     );
 
     await createAuditLog(
-    "SERVER_CREATED",
-    {
-        serverId:
-            result.rows[0].id,
+        "SERVER_CREATED",
+        {
+            serverId:
+                result.rows[0].id,
 
-        userId,
+            userId,
 
-        name,
+            name,
 
-        description
-    }
-);
+            description
+        }
+    );
 
-    return result.rows[0];
+    const {
+        admin_password_hash,
+        ...safeServer
+    } = result.rows[0];
+
+    return safeServer;
+
 }
-
 async function getServers(userId) {
 
     const result = await pool.query(
         `
         SELECT
-            s.*,
+            s.id,
+            s.user_id,
+            s.name,
+            s.description,
+            s.status,
+            s.created_at,
+            s.updated_at,
             a.last_seen
         FROM servers s
         LEFT JOIN agents a
@@ -77,23 +118,40 @@ async function getServers(userId) {
             ...server,
             connectionStatus
         };
+
     });
+
 }
 
-async function getServerById(userId, serverId) {
+async function getServerById(
+    userId,
+    serverId
+) {
 
     const result = await pool.query(
         `
-        SELECT *
+        SELECT
+            id,
+            user_id,
+            name,
+            description,
+            status,
+            created_at,
+            updated_at
         FROM servers
         WHERE id = $1
         AND user_id = $2
         `,
-        [serverId, userId]
+        [
+            serverId,
+            userId
+        ]
     );
 
     return result.rows[0];
+
 }
+
 
 async function updateServer(userId, serverId, data) {
 
@@ -335,6 +393,47 @@ async function getServerAgent(userId, serverId) {
     };
 }
 
+async function verifyServerPassword(
+    userId,
+    serverId,
+    password
+) {
+
+    const result = await pool.query(
+        `
+        SELECT
+            admin_password_hash
+        FROM servers
+        WHERE id = $1
+        AND user_id = $2
+        `,
+        [
+            serverId,
+            userId
+        ]
+    );
+
+    const server =
+        result.rows[0];
+
+    if (!server) {
+
+        throw new Error(
+            "Servidor no encontrado"
+        );
+
+    }
+
+    const valid =
+        await bcrypt.compare(
+            password,
+            server.admin_password_hash
+        );
+
+    return valid;
+
+}
+
 module.exports = {
     createServer,
     getServers,
@@ -343,5 +442,6 @@ module.exports = {
     deleteServer,
     getServerMetrics,
     getLatestMetrics,
-    getServerAgent
+    getServerAgent,
+    verifyServerPassword
 };

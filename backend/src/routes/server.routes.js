@@ -15,7 +15,8 @@ const {
     deleteServer,
     getServerMetrics,
     getLatestMetrics,
-    getServerAgent
+    getServerAgent,
+    verifyServerPassword
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -49,6 +50,13 @@ router.get("/:id", authenticate, getServerById);
 router.put("/:id", authenticate, updateServer);
 
 router.delete("/:id", authenticate, deleteServer);
+
+
+router.post(
+    "/:id/verify-password",
+    authenticate,
+    verifyServerPassword
+);
 
 
 module.exports = router;

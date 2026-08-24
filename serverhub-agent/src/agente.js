@@ -43,25 +43,25 @@ async function iniciarAgente() {
         );
 
         const sistema =
-    obtenerInformacionSistema(
-        config.version
-    );
+            obtenerInformacionSistema(
+                config.version
+            );
 
-console.log(
-    `💻 Equipo: ${sistema.hostname}`
-);
+        console.log(
+            `💻 Equipo: ${sistema.hostname}`
+        );
 
-console.log(
-    `🖥️ Sistema: ${sistema.plataforma}`
-);
+        console.log(
+            `🖥️ Sistema: ${sistema.plataforma}`
+        );
 
-console.log(
-    `⚙️ Arquitectura: ${sistema.arquitectura}`
-);
+        console.log(
+            `⚙️ Arquitectura: ${sistema.arquitectura}`
+        );
 
-console.log(
-    `⏱️ Tiempo encendido: ${sistema.tiempoEncendido}`
-);
+        console.log(
+            `⏱️ Tiempo encendido: ${sistema.tiempoEncendido}`
+        );
 
         if (config.agentToken) {
 
@@ -76,7 +76,7 @@ console.log(
             await enviarInformacionSistema();
 
             iniciarMonitorToken();
-            
+
             iniciarHeartbeat();
 
             console.log(
@@ -96,23 +96,57 @@ console.log(
             console.log("");
 
             return;
+
         }
 
         console.log(
             "⚠️ Agente no registrado"
         );
 
-        const resultado = await registerAgent(
-            "SHUB-7C06-6C9B"
-        );
+        const registrationKey =
+            process.argv[2];
+
+        if (!registrationKey) {
+
+            console.log("");
+
+            console.log(
+                "❌ Debe proporcionar una Registration Key"
+            );
+
+            console.log("");
+
+            console.log(
+                "Uso:"
+            );
+
+            console.log(
+                "node src/index.js SHUB-XXXX-XXXX"
+            );
+
+            console.log("");
+
+            return;
+
+        }
+
+        const resultado =
+            await registerAgent(
+                registrationKey
+            );
 
         console.log(
             "✅ Agente registrado"
         );
 
-        console.log(resultado);
+        console.log(
+            resultado
+        );
 
         await enviarInformacionSistema();
+
+        iniciarMonitorToken();
+
         iniciarHeartbeat();
 
         console.log(
@@ -135,7 +169,8 @@ console.log(
 
         console.error(
             "❌ Error:",
-            error.response?.data || error.message
+            error.response?.data ||
+            error.message
         );
 
     }

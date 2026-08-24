@@ -228,6 +228,35 @@ async function getServerAgent(req, res) {
     }
 }
 
+async function verifyServerPassword(
+    req,
+    res
+) {
+
+    try {
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    req.body.password
+                );
+
+        res.json({
+            success: valid
+        });
+
+    } catch (error) {
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
 
 module.exports = {
     getHealth,
@@ -239,5 +268,6 @@ module.exports = {
     updateServer,
     deleteServer,
     getServerMetrics,
-    getServerAgent
+    getServerAgent,
+    verifyServerPassword
 };
