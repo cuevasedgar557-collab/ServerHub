@@ -1,4 +1,5 @@
 import API_URL from "../config/api";
+import { handleResponse } from "./apiClient";
 
 export async function getServers(token) {
 
@@ -11,7 +12,7 @@ export async function getServers(token) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function createServer(token, data) {
@@ -28,7 +29,7 @@ export async function createServer(token, data) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function getServerById(token, id) {
@@ -42,7 +43,7 @@ export async function getServerById(token, id) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function updateServer(token, id, data) {
@@ -59,7 +60,7 @@ export async function updateServer(token, id, data) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function deleteServer(token, id) {
@@ -74,7 +75,7 @@ export async function deleteServer(token, id) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function getServerAgent(token, id) {
@@ -88,7 +89,7 @@ export async function getServerAgent(token, id) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function getServerMetrics(token, id) {
@@ -102,7 +103,7 @@ export async function getServerMetrics(token, id) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
 
 export async function getLatestMetrics(token, id) {
@@ -116,9 +117,8 @@ export async function getLatestMetrics(token, id) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }
-
 
 export async function verifyServerPassword(token, id, password) {
 
@@ -134,5 +134,5 @@ export async function verifyServerPassword(token, id, password) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }

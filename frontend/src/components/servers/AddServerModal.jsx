@@ -3,6 +3,7 @@ import { createServer } from "../../services/serverService";
 import { createRegistrationKey } from "../../services/registrationKeyService";
 import Field from "../ui/Field";
 import Button from "../ui/Button";
+import { useToast } from "../ui/Toast";
 
 function AddServerModal({ onClose, onCreated }) {
   const [name, setName] = useState("");
@@ -12,6 +13,7 @@ function AddServerModal({ onClose, onCreated }) {
   const [loading, setLoading] = useState(false);
   const [registrationKey, setRegistrationKey] = useState(null);
   const [copied, setCopied] = useState(false);
+  const showToast = useToast();
 
   async function crearServidor(e) {
     e.preventDefault();
@@ -47,11 +49,12 @@ function AddServerModal({ onClose, onCreated }) {
     }
   }
 
-  function copiarClave() {
-    navigator.clipboard.writeText(registrationKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+function copiarClave() {
+  navigator.clipboard.writeText(registrationKey);
+  setCopied(true);
+  showToast("Clave copiada al portapapeles");
+  setTimeout(() => setCopied(false), 2000);
+}
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

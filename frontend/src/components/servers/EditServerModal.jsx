@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { updateServer } from "../../services/serverService";
+import { useToast } from "../ui/Toast";
 import Field from "../ui/Field";
 import Button from "../ui/Button";
 
@@ -8,6 +9,7 @@ function EditServerModal({ server, onClose, onUpdated }) {
   const [description, setDescription] = useState(server.description || "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const showToast = useToast();
 
   async function guardarCambios(e) {
     e.preventDefault();
@@ -29,6 +31,7 @@ function EditServerModal({ server, onClose, onUpdated }) {
       }
 
       onUpdated();
+      showToast("Servidor actualizado");
       onClose();
     } catch (error) {
       console.error(error);

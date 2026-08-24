@@ -2,35 +2,45 @@ import { useEffect, useState } from "react";
 import { getDashboard } from "../services/dashboardService";
 import AppShell from "../components/layout/AppShell";
 import StatCard from "../components/dashboard/StatCard";
+import Skeleton from "../components/ui/Skeleton";
 import Servers from "./Servers";
 
 function Dashboard() {
 
   const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
 
-    async function cargarDashboard() {
+  async function cargarDashboard() {
 
-      try {
+    try {
 
-        const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
 
-        const datos = await getDashboard(token);
+      const datos = await getDashboard(token);
 
-        setDashboard(datos.dashboard);
+      setDashboard(datos.dashboard);
 
-      } catch (error) {
+    } catch (error) {
 
-        console.error(error);
+      console.error(error);
 
-      }
+    } finally {
+
+      setLoading(false);
 
     }
 
-    cargarDashboard();
+  }
 
-  }, []);
+  cargarDashboard();
+
+  const intervalo = setInterval(cargarDashboard, 20000);
+
+  return () => clearInterval(intervalo);
+
+}, []);
 
   return (
     <AppShell>
@@ -39,7 +49,20 @@ function Dashboard() {
         <h2 className="section__title">Bienvenido a ServerHub</h2>
       </section>
 
-      {dashboard && (
+      {loading && (
+        <section className="section">
+          <div className="stat-grid">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="stat-card stat-card--skeleton">
+                <Skeleton style={{ width: "60%", height: "11px" }} />
+                <Skeleton style={{ width: "40%", height: "24px" }} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!loading && dashboard && (
         <section className="section">
           <div className="stat-grid">
             <StatCard label="Servidores" value={dashboard.totalServers} />

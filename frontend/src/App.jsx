@@ -3,51 +3,57 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ServerDetail from "./pages/ServerDetail";
+import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 import GuestRoute from "./components/routing/GuestRoute";
+import { ToastProvider } from "./components/ui/Toast";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <Login />
-            </GuestRoute>
-          }
-        />
+      <ToastProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        <Route
-          path="/register"
-          element={
-            <GuestRoute>
-              <Register />
-            </GuestRoute>
-          }
-        />
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            }
+          />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/register"
+            element={
+              <GuestRoute>
+                <Register />
+              </GuestRoute>
+            }
+          />
 
-        <Route
-          path="/servers/:id"
-          element={
-            <ProtectedRoute>
-              <ServerDetail />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+          <Route
+            path="/servers/:id"
+            element={
+              <ProtectedRoute>
+                <ServerDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ToastProvider>
     </BrowserRouter>
   );
 }

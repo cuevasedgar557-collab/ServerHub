@@ -1,4 +1,5 @@
 import API_URL from "../config/api";
+import { handleResponse } from "./apiClient";
 
 export async function getDashboard(token) {
 
@@ -12,5 +13,5 @@ export async function getDashboard(token) {
     }
   );
 
-  return await respuesta.json();
+  return await handleResponse(respuesta);
 }

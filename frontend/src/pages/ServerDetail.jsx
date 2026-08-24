@@ -12,6 +12,8 @@ import StatusDot from "../components/ui/StatusDot";
 import StatCard from "../components/dashboard/StatCard";
 import MetricsChart from "../components/servers/MetricsChart";
 import Button from "../components/ui/Button";
+import Skeleton from "../components/ui/Skeleton";
+import { useToast } from "../components/ui/Toast";
 
 function ServerDetail() {
   const { id } = useParams();
@@ -26,43 +28,70 @@ function ServerDetail() {
   const [generatingKey, setGeneratingKey] = useState(false);
   const [keyError, setKeyError] = useState("");
   const [copied, setCopied] = useState(false);
+  const showToast = useToast();
 
   useEffect(() => {
 
-    async function cargar() {
+  async function cargar() {
 
-      try {
+    try {
 
-        const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
 
-        const [serverDatos, agentDatos, latestDatos, metricsDatos] =
-          await Promise.all([
-            getServerById(token, id),
-            getServerAgent(token, id),
-            getLatestMetrics(token, id),
-            getServerMetrics(token, id)
-          ]);
+      const [serverDatos, agentDatos, latestDatos, metricsDatos] =
+        await Promise.all([
+          getServerById(token, id),
+          getServerAgent(token, id),
+          getLatestMetrics(token, id),
+          getServerMetrics(token, id)
+        ]);
 
-        if (serverDatos.success) setServer(serverDatos.server);
-        if (agentDatos.success) setAgent(agentDatos.agent);
-        if (latestDatos.success) setLatest(latestDatos.data);
-        if (metricsDatos.success) setHistory(metricsDatos.metrics || []);
+      if (serverDatos.success) setServer(serverDatos.server);
+      if (agentDatos.success) setAgent(agentDatos.agent);
+      if (latestDatos.success) setLatest(latestDatos.data);
+      if (metricsDatos.success) setHistory(metricsDatos.metrics || []);
 
-      } catch (error) {
+    } catch (error) {
 
-        console.error(error);
+      console.error(error);
 
-      } finally {
+    } finally {
 
-        setLoading(false);
-
-      }
+      setLoading(false);
 
     }
 
-    cargar();
+  }
 
-  }, [id]);
+  async function refrescarEstado() {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const [agentDatos, latestDatos] = await Promise.all([
+        getServerAgent(token, id),
+        getLatestMetrics(token, id)
+      ]);
+
+      if (agentDatos.success) setAgent(agentDatos.agent);
+      if (latestDatos.success) setLatest(latestDatos.data);
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  }
+
+  cargar();
+
+  const intervalo = setInterval(refrescarEstado, 15000);
+
+  return () => clearInterval(intervalo);
+
+}, [id]);
 
   async function regenerarClave() {
 
@@ -95,11 +124,12 @@ function ServerDetail() {
 
   }
 
-  function copiarClave() {
-    navigator.clipboard.writeText(registrationKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+function copiarClave() {
+  navigator.clipboard.writeText(registrationKey);
+  setCopied(true);
+  showToast("Clave copiada al portapapeles");
+  setTimeout(() => setCopied(false), 2000);
+}
 
   const online = latest?.connectionStatus === "online";
   const latestMetrics = latest?.metrics;
@@ -117,7 +147,27 @@ function ServerDetail() {
         ← Volver al dashboard
       </Link>
 
-      {loading && <p className="section__eyebrow">Cargando...</p>}
+      {loading && (
+  <>
+    <section className="section detail-head">
+      <div>
+        <Skeleton style={{ width: "160px", height: "13px", marginBottom: "10px" }} />
+        <Skeleton style={{ width: "220px", height: "22px" }} />
+      </div>
+    </section>
+
+    <section className="section">
+      <div className="stat-grid">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="stat-card stat-card--skeleton">
+            <Skeleton style={{ width: "60%", height: "11px" }} />
+            <Skeleton style={{ width: "40%", height: "24px" }} />
+          </div>
+        ))}
+      </div>
+    </section>
+  </>
+)}
 
       {!loading && !server && (
         <div className="empty-state">

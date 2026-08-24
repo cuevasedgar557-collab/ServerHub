@@ -5,6 +5,8 @@ import AddServerModal from "../components/servers/AddServerModal";
 import EditServerModal from "../components/servers/EditServerModal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import Button from "../components/ui/Button";
+import Skeleton from "../components/ui/Skeleton";
+import { useToast } from "../components/ui/Toast";
 
 function Servers() {
 
@@ -15,6 +17,7 @@ function Servers() {
   const [deletingServer, setDeletingServer] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const showToast = useToast();
 
   async function cargarServidores() {
 
@@ -67,6 +70,11 @@ function Servers() {
       await deleteServer(token, deletingServer.id);
 
       setDeletingServer(null);
+      setDeletingServer(null);
+
+showToast(`Servidor "${deletingServer.name}" eliminado`);
+
+cargarServidores();
 
       cargarServidores();
 
@@ -97,22 +105,36 @@ function Servers() {
       </div>
 
       {!loading && servers.length === 0 && (
-        <div className="empty-state">
-          <strong>Aún no tienes servidores</strong>
-          Agrega tu primer VPS para empezar a monitorearlo.
-        </div>
-      )}
+  <div className="empty-state">
+    <strong>Aún no tienes servidores</strong>
+    Agrega tu primer VPS para empezar a monitorearlo.
+  </div>
+)}
 
-      <div className="server-list">
-        {servers.map((server) => (
-          <ServerCard
-            key={server.id}
-            server={server}
-            onEdit={() => setEditingServer(server)}
-            onDelete={() => setDeletingServer(server)}
-          />
-        ))}
+{loading && (
+  <div className="server-list">
+    {Array.from({ length: 3 }).map((_, i) => (
+      <div key={i} className="server-card server-card--skeleton">
+        <Skeleton style={{ width: "12px", height: "12px", borderRadius: "50%" }} />
+        <Skeleton style={{ width: "180px", height: "16px" }} />
+        <Skeleton style={{ width: "70px", height: "14px", marginLeft: "auto" }} />
       </div>
+    ))}
+  </div>
+)}
+
+{!loading && (
+  <div className="server-list">
+    {servers.map((server) => (
+      <ServerCard
+        key={server.id}
+        server={server}
+        onEdit={() => setEditingServer(server)}
+        onDelete={() => setDeletingServer(server)}
+      />
+    ))}
+  </div>
+)}
 
       {showAddModal && (
         <AddServerModal
