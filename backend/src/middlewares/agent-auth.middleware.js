@@ -79,17 +79,45 @@ if (
                 )
                 .update(payload)
                 .digest("hex");
-
         if (
-            signature !==
-            expectedSignature
-        ) {
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Firma inválida"
-            });
-        }
+    typeof signature !== "string" ||
+    !/^[a-fA-F0-9]{64}$/.test(signature)
+) {
+    return res.status(401).json({
+        success: false,
+        message: "Firma inválida"
+    });
+}
+
+        const signatureBuffer =
+    Buffer.from(signature, "hex");
+
+const expectedBuffer =
+    Buffer.from(expectedSignature, "hex");
+
+if (
+    signatureBuffer.length !==
+    expectedBuffer.length
+) {
+    return res.status(401).json({
+        success: false,
+        message:
+            "Firma inválida"
+    });
+}
+
+if (
+    !crypto.timingSafeEqual(
+        signatureBuffer,
+        expectedBuffer
+    )
+) {
+    return res.status(401).json({
+        success: false,
+        message:
+            "Firma inválida"
+    });
+}
         const timestamp = req.body.timestamp;
 
 if (
@@ -121,11 +149,12 @@ if (difference > maxDifference) {
 const nonce = req.body.nonce;
 
 if (
-    typeof nonce !== "string"
+    typeof nonce !== "string" ||
+    !/^[a-fA-F0-9]{32}$/.test(nonce)
 ) {
     return res.status(401).json({
         success: false,
-        message: "Nonce requerido"
+        message: "Nonce inválido"
     });
 }
 

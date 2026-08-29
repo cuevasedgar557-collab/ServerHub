@@ -7,140 +7,160 @@ const {
 
 async function registerAgent(data) {
 
-const {
-    registrationKey,
-    version,
-    hostname,
-    operatingSystem,
-    architecture
-} = data;
+    const client = await pool.connect();
 
-    const keyResult = await pool.query(
-        `
-        SELECT *
-        FROM registration_keys
-        WHERE registration_key = $1
-        `,
-        [registrationKey]
-    );
+    try {
 
+        await client.query("BEGIN");
 
-    const key = keyResult.rows[0];
-
-    if (!key) {
-        throw new Error("Clave inválida");
-    }
-
-    if (key.is_used) {
-        throw new Error("Clave ya utilizada");
-    }
-
-    if (
-        new Date(key.expires_at) <
-        new Date()
-    ) {
-        throw new Error("Clave expirada");
-    }
-
-    const serverId = key.server_id;
-
-    if (!serverId) {
-        throw new Error(
-            "La clave no está asociada a un servidor"
-        );
-    }
-
-    const agentToken =
-    "agt_" +
-    crypto.randomBytes(16).toString("hex");
-
-const agentSecret =
-    crypto.randomBytes(32).toString("hex");
-const tokenExpiresAt =
-    new Date(
-        Date.now() +
-        90 * 24 * 60 * 60 * 1000
-    );
-
-    const agentResult = await pool.query(
-        `
-        INSERT INTO agents
-        (
-            server_id,
-            agent_token,
-            agent_secret,
-            token_expires_at,
+        const {
+            registrationKey,
             version,
-            hostname,
-            operating_system,
-            architecture
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING *
-        `,
-        [
-            serverId,
-            agentToken,
-            agentSecret,
-            tokenExpiresAt,
-            version || "1.0.0",
             hostname,
             operatingSystem,
             architecture
-        ]
-    );
+        } = data;
 
-    await pool.query(
-        `
-        UPDATE registration_keys
-        SET is_used = true
-        WHERE id = $1
-        `,
-        [key.id]
-    );
+        const keyResult = await client.query(
+            `
+            SELECT *
+            FROM registration_keys
+            WHERE registration_key = $1
+            `,
+            [registrationKey]
+        );
 
+        const key = keyResult.rows[0];
+
+        if (!key) {
+            throw new Error("Clave inválida");
+        }
+
+        if (key.is_used) {
+            throw new Error("Clave ya utilizada");
+        }
+
+        if (
+            new Date(key.expires_at) <
+            new Date()
+        ) {
+            throw new Error("Clave expirada");
+        }
+
+        const serverId = key.server_id;
+
+        if (!serverId) {
+            throw new Error(
+                "La clave no está asociada a un servidor"
+            );
+        }
+
+        const agentToken =
+            "agt_" +
+            crypto.randomBytes(16).toString("hex");
+
+        const agentSecret =
+            crypto.randomBytes(32).toString("hex");
+
+        const tokenExpiresAt =
+            new Date(
+                Date.now() +
+                90 * 24 * 60 * 60 * 1000
+            );
+
+        const agentResult = await client.query(
+            `
+            INSERT INTO agents
+            (
+                server_id,
+                agent_token,
+                agent_secret,
+                token_expires_at,
+                version,
+                hostname,
+                operating_system,
+                architecture
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *
+            `,
+            [
+                serverId,
+                agentToken,
+                agentSecret,
+                tokenExpiresAt,
+                version || "1.0.0",
+                hostname,
+                operatingSystem,
+                architecture
+            ]
+        );
+
+        await client.query(
+            `
+            UPDATE registration_keys
+            SET is_used = true
+            WHERE id = $1
+            `,
+            [key.id]
+        );
 
         await createAuditLog(
-    "REGISTRATION_KEY_USED",
-    {
-        registrationKey:
-            registrationKey,
+            "REGISTRATION_KEY_USED",
+            {
+                registrationKey:
+                    registrationKey,
 
-        registrationKeyId:
-            key.id,
+                registrationKeyId:
+                    key.id,
 
-        serverId,
+                serverId,
 
-        agentId:
-            agentResult.rows[0].id
+                agentId:
+                    agentResult.rows[0].id
+            },
+            client
+        );
+
+        await createAuditLog(
+            "AGENT_REGISTERED",
+            {
+                agentId:
+                    agentResult.rows[0].id,
+
+                serverId,
+
+                hostname,
+
+                operatingSystem,
+
+                architecture,
+
+                version:
+                    version || "1.0.0"
+            },
+            client
+        );
+
+        await client.query("COMMIT");
+
+        return {
+            agentId: agentResult.rows[0].id,
+            agentToken,
+            agentSecret
+        };
+
+    } catch (error) {
+
+        await client.query("ROLLBACK");
+
+        throw error;
+
+    } finally {
+
+        client.release();
+
     }
-);
-
-
-    await createAuditLog(
-    "AGENT_REGISTERED",
-    {
-        agentId:
-            agentResult.rows[0].id,
-
-        serverId,
-
-        hostname,
-
-        operatingSystem,
-
-        architecture,
-
-        version:
-            version || "1.0.0"
-    }
-);
-
-    return {
-        agentId: agentResult.rows[0].id,
-        agentToken,
-        agentSecret
-    };
 }
 
 async function heartbeat(agentToken) {

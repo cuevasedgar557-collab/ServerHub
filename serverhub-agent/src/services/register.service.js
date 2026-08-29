@@ -1,15 +1,12 @@
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+
 const {
     obtenerInformacionSistema
 } = require("./system.service");
 
-
-const configPath = path.join(
-    __dirname,
-    "../config/config.json"
-);
+const {
+    saveCredentials
+} = require("./credentials.service");
 
 async function registerAgent(
     registrationKey
@@ -19,9 +16,9 @@ async function registerAgent(
         require("../config/config.json");
 
     const sistema =
-    obtenerInformacionSistema(
-        config.version
-    );
+        obtenerInformacionSistema(
+            config.version
+        );
 
     const response = await axios.post(
         `${config.apiUrl}/api/agent/register`,
@@ -35,21 +32,14 @@ async function registerAgent(
     );
 
     const agentToken =
-    response.data.agentToken;
+        response.data.agentToken;
 
     const agentSecret =
-    response.data.agentSecret;
+        response.data.agentSecret;
 
-    config.agentToken = agentToken;
-    config.agentSecret = agentSecret;
-
-    fs.writeFileSync(
-        configPath,
-        JSON.stringify(
-            config,
-            null,
-            4
-        )
+    saveCredentials(
+        agentToken,
+        agentSecret
     );
 
     return response.data;

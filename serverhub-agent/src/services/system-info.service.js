@@ -14,9 +14,24 @@ const {
     "../utils/nonce"
 );
 
+const {
+    decommissionAgent
+} = require(
+    "./decommission.service"
+);
+
+const {
+    loadCredentials
+} = require(
+    "./credentials.service"
+);
+
 async function enviarInformacionSistema() {
 
     try {
+
+        const credentials =
+    loadCredentials();
 
         const sistema =
             obtenerInformacionSistema(
@@ -38,7 +53,7 @@ async function enviarInformacionSistema() {
 
 const firma = generarFirma(
     JSON.stringify(payload),
-    config.agentSecret
+    credentials.agentSecret
 );
 
 await axios.post(
@@ -47,7 +62,7 @@ await axios.post(
     {
         headers: {
             "X-Agent-Token":
-                config.agentToken,
+                credentials.agentToken,
             "X-Agent-Signature":
                 firma
         }

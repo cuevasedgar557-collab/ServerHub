@@ -186,11 +186,48 @@ async function deleteServer(
     serverId
 ) {
 
-    const serverResult =
-        await pool.query(
+    const client = await pool.connect();
+
+    try {
+
+        await client.query("BEGIN");
+
+        const serverResult =
+            await client.query(
+                `
+                SELECT *
+                FROM servers
+                WHERE id = $1
+                AND user_id = $2
+                `,
+                [
+                    serverId,
+                    userId
+                ]
+            );
+
+        const server =
+            serverResult.rows[0];
+
+        if (!server) {
+
+            throw new Error(
+                "Servidor no encontrado"
+            );
+
+        }
+
+        await client.query(
             `
-            SELECT *
-            FROM servers
+            DELETE FROM agents
+            WHERE server_id = $1
+            `,
+            [serverId]
+        );
+
+        await client.query(
+            `
+            DELETE FROM servers
             WHERE id = $1
             AND user_id = $2
             `,
@@ -200,48 +237,31 @@ async function deleteServer(
             ]
         );
 
-    const server =
-        serverResult.rows[0];
-
-    if (!server) {
-
-        throw new Error(
-            "Servidor no encontrado"
+        await createAuditLog(
+            "SERVER_DELETED",
+            {
+                serverId,
+                userId,
+                name: server.name
+            },
+            client
         );
 
+        await client.query("COMMIT");
+
+        return server;
+
+    } catch (error) {
+
+        await client.query("ROLLBACK");
+
+        throw error;
+
+    } finally {
+
+        client.release();
+
     }
-
-    await pool.query(
-        `
-        DELETE FROM agents
-        WHERE server_id = $1
-        `,
-        [serverId]
-    );
-
-    await pool.query(
-        `
-        DELETE FROM servers
-        WHERE id = $1
-        AND user_id = $2
-        `,
-        [
-            serverId,
-            userId
-        ]
-    );
-
-    await createAuditLog(
-        "SERVER_DELETED",
-        {
-            serverId,
-            userId,
-            name: server.name
-        }
-    );
-
-    return server;
-
 }
 
 async function getServerMetrics(userId, serverId) {

@@ -19,69 +19,90 @@ function generateKey() {
 
 async function createKey(userId, serverId) {
 
-    const agentResult = await pool.query(
-        `
-        SELECT id
-        FROM agents
-        WHERE server_id = $1
-        `,
-        [serverId]
-    );
+    const client = await pool.connect();
 
-    if (agentResult.rows.length > 0) {
-        throw new Error(
-            "Este servidor ya tiene un agente vinculado"
+    try {
+
+        await client.query("BEGIN");
+
+        const agentResult = await client.query(
+            `
+            SELECT id
+            FROM agents
+            WHERE server_id = $1
+            `,
+            [serverId]
         );
+
+        if (agentResult.rows.length > 0) {
+            throw new Error(
+                "Este servidor ya tiene un agente vinculado"
+            );
+        }
+
+        await client.query(
+            `
+            UPDATE registration_keys
+            SET is_used = true
+            WHERE server_id = $1
+            AND is_used = false
+            `,
+            [serverId]
+        );
+
+        const registrationKey = generateKey();
+
+        const expiresAt = new Date();
+
+        expiresAt.setDate(
+            expiresAt.getDate() + 1
+        );
+
+        const result = await client.query(
+            `
+            INSERT INTO registration_keys
+            (
+                user_id,
+                server_id,
+                registration_key,
+                expires_at
+            )
+            VALUES ($1, $2, $3, $4)
+            RETURNING *
+            `,
+            [
+                userId,
+                serverId,
+                registrationKey,
+                expiresAt
+            ]
+        );
+
+        await createAuditLog(
+            "REGISTRATION_KEY_CREATED",
+            {
+                registrationKey,
+                serverId,
+                expiresAt
+            },
+            client
+        );
+
+        await client.query("COMMIT");
+
+        return result.rows[0];
+
+    } catch (error) {
+
+        await client.query("ROLLBACK");
+
+        throw error;
+
+    } finally {
+
+        client.release();
+
     }
-
-    await pool.query(
-        `
-        UPDATE registration_keys
-        SET is_used = true
-        WHERE server_id = $1
-        AND is_used = false
-        `,
-        [serverId]
-    );
-
-    const registrationKey = generateKey();
-
-    const expiresAt = new Date();
-
-    expiresAt.setDate(
-        expiresAt.getDate() + 1
-    );
-
-    const result = await pool.query(
-        `
-        INSERT INTO registration_keys
-        (
-            user_id,
-            server_id,
-            registration_key,
-            expires_at
-        )
-        VALUES ($1, $2, $3, $4)
-        RETURNING *
-        `,
-        [
-            userId,
-            serverId,
-            registrationKey,
-            expiresAt
-        ]
-    );
-
-    await createAuditLog(
-    "REGISTRATION_KEY_CREATED",
-    {
-        registrationKey,
-        serverId,
-        expiresAt
-    }
-);
-
-    return result.rows[0];
 }
 
 async function getKeys(userId) {

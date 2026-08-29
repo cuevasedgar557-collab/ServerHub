@@ -1,33 +1,15 @@
-const fs = require("fs");
-const path = require("path");
-
-const configPath = path.join(
-    __dirname,
-    "../config/config.json"
+const {
+    clearCredentials
+} = require(
+    "./credentials.service"
 );
 
 function decommissionAgent() {
 
-    const config = JSON.parse(
-        fs.readFileSync(
-            configPath,
-            "utf8"
-        )
-    );
-
-    config.agentToken = "";
-    config.agentSecret = "";
-
-    fs.writeFileSync(
-        configPath,
-        JSON.stringify(
-            config,
-            null,
-            4
-        )
-    );
+    clearCredentials();
 
     console.log("");
+
     console.log(
         "⚠️ Agente dado de baja"
     );

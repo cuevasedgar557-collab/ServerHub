@@ -15,9 +15,18 @@ const {
     "./token-refresh.service"
 );
 
+const {
+    loadCredentials
+} = require(
+    "./credentials.service"
+);
+
 async function verificarToken() {
 
     try {
+
+        const credentials =
+    loadCredentials();
 
         const payload = {
             timestamp: Date.now(),
@@ -26,7 +35,7 @@ async function verificarToken() {
 
         const firma = generarFirma(
             JSON.stringify(payload),
-            config.agentSecret
+            credentials.agentSecret
         );
 
         const response =
@@ -36,8 +45,7 @@ async function verificarToken() {
                 {
                     headers: {
                         "X-Agent-Token":
-                            config.agentToken,
-
+                            credentials.agentToken,
                         "X-Agent-Signature":
                             firma
                     }

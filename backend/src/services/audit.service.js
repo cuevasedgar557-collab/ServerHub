@@ -2,10 +2,10 @@ const pool = require("../config/db");
 
 async function createAuditLog(
     eventType,
-    details = {}
+    details = {},
+    client = pool
 ) {
-
-    await pool.query(
+    await client.query(
         `
         INSERT INTO audit_logs
         (
@@ -19,7 +19,6 @@ async function createAuditLog(
             details
         ]
     );
-
 }
 
 module.exports = {

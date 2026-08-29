@@ -1,17 +1,18 @@
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+
 
 const config = require("../config/config.json");
 const { generarFirma } = require("../utils/signature");
 const { generarNonce } = require("../utils/nonce");
+const {
+    loadCredentials,
+    saveCredentials
+} = require("./credentials.service");
 
-const configPath = path.join(
-    __dirname,
-    "../config/config.json"
-);
 
 async function renovarToken() {
+    const credentials =
+    loadCredentials();
 
     const payload = {
         timestamp: Date.now(),
@@ -20,7 +21,7 @@ async function renovarToken() {
 
     const firma = generarFirma(
         JSON.stringify(payload),
-        config.agentSecret
+        credentials.agentSecret
     );
 
     console.log(
@@ -33,27 +34,17 @@ async function renovarToken() {
         {
             headers: {
                 "X-Agent-Token":
-                    config.agentToken,
+                    credentials.agentToken,
                 "X-Agent-Signature":
                     firma
             }
         }
     );
 
-    config.agentToken =
-        response.data.agentToken;
-
-    config.agentSecret =
-        response.data.agentSecret;
-
-    fs.writeFileSync(
-        configPath,
-        JSON.stringify(
-            config,
-            null,
-            4
-        )
-    );
+        saveCredentials(
+    response.data.agentToken,
+    response.data.agentSecret
+);
 
     console.log(
         "🔄 Token renovado correctamente"

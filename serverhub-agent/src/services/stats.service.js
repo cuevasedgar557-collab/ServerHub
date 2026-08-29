@@ -16,6 +16,12 @@ const {
     "./decommission.service"
 );
 
+const {
+    loadCredentials
+} = require(
+    "./credentials.service"
+);
+
 async function obtenerMetricas() {
 
     const cargaCpu = await si.currentLoad();
@@ -48,6 +54,8 @@ async function obtenerMetricas() {
 async function enviarMetricas() {
 
     try {
+        const credentials =
+    loadCredentials();
 
         const metricas =
             await obtenerMetricas();
@@ -60,7 +68,7 @@ async function enviarMetricas() {
 
 const firma = generarFirma(
     JSON.stringify(payload),
-    config.agentSecret
+    credentials.agentSecret
 );
 
 await axios.post(
@@ -69,7 +77,7 @@ await axios.post(
     {
         headers: {
             "X-Agent-Token":
-                config.agentToken,
+                credentials.agentToken,
             "X-Agent-Signature":
                 firma
         }

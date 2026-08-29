@@ -28,6 +28,13 @@ const {
     "./services/token-monitor.service"
 );
 
+const {
+    migrateFromConfig,
+    loadCredentials
+} = require(
+    "./services/credentials.service"
+);
+
 async function iniciarAgente() {
 
     try {
@@ -41,6 +48,9 @@ async function iniciarAgente() {
         console.log(
             "✅ Configuración cargada"
         );
+        migrateFromConfig(config);
+        const credentials =
+    loadCredentials();
 
         const sistema =
             obtenerInformacionSistema(
@@ -63,14 +73,14 @@ async function iniciarAgente() {
             `⏱️ Tiempo encendido: ${sistema.tiempoEncendido}`
         );
 
-        if (config.agentToken) {
+        if (credentials.agentToken) {
 
             console.log(
                 "✅ Agente identificado"
             );
 
             console.log(
-                `🔑 Token: ${config.agentToken}`
+                `🔑 Token: ${credentials.agentToken}`
             );
 
             await enviarInformacionSistema();

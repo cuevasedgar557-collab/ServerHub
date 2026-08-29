@@ -12,8 +12,17 @@ const {
     "./decommission.service"
 );
 
+const {
+    loadCredentials
+} = require(
+    "./credentials.service"
+);
+
 async function enviarHeartbeat() {
     try {
+
+        const credentials =
+    loadCredentials();
 
         const payload = {
             timestamp: Date.now(),
@@ -22,7 +31,7 @@ async function enviarHeartbeat() {
 
         const firma = generarFirma(
             JSON.stringify(payload),
-            config.agentSecret
+            credentials.agentSecret
         );
 
         await axios.post(
@@ -31,7 +40,7 @@ async function enviarHeartbeat() {
             {
                 headers: {
                     "X-Agent-Token":
-                        config.agentToken,
+                        credentials.agentToken,
                     "X-Agent-Signature":
                         firma
                 }
