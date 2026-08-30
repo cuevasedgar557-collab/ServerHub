@@ -12,6 +12,9 @@ const dashboardRoutes =
 const healthRoutes =
     require("./routes/health.routes");
 
+const alertRoutes =
+    require("./routes/alert.routes");
+
 const app = express();
 
 app.use(cors());
@@ -23,5 +26,6 @@ app.use("/api/registration-keys", registrationKeyRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/health", healthRoutes);
+app.use( "/api/alerts", alertRoutes);
 
 module.exports = app;

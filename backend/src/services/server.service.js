@@ -74,27 +74,39 @@ async function createServer(userId, data) {
     return safeServer;
 
 }
-async function getServers(userId) {
+async function getServers(
+    userId,
+    page = 1,
+    limit = 50
+) {
+    const offset =
+    (page - 1) * limit;
 
-    const result = await pool.query(
-        `
-        SELECT
-            s.id,
-            s.user_id,
-            s.name,
-            s.description,
-            s.status,
-            s.created_at,
-            s.updated_at,
-            a.last_seen
-        FROM servers s
-        LEFT JOIN agents a
-            ON a.server_id = s.id
-        WHERE s.user_id = $1
-        ORDER BY s.id ASC
-        `,
-        [userId]
-    );
+const result = await pool.query(
+    `
+    SELECT
+        s.id,
+        s.user_id,
+        s.name,
+        s.description,
+        s.status,
+        s.created_at,
+        s.updated_at,
+        a.last_seen
+    FROM servers s
+    LEFT JOIN agents a
+        ON a.server_id = s.id
+    WHERE s.user_id = $1
+    ORDER BY s.id ASC
+    LIMIT $2
+    OFFSET $3
+    `,
+    [
+        userId,
+        limit,
+        offset
+    ]
+);
 
     return result.rows.map(server => {
 

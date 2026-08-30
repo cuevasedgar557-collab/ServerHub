@@ -5,6 +5,11 @@ const {
     createAuditLog
 } = require("./audit.service");
 
+const {
+    createAlert,
+    resolveAlert
+} = require("./alert.service");
+
 async function registerAgent(data) {
 
     const client = await pool.connect();
@@ -215,6 +220,26 @@ async function saveStats(agentId, data) {
         );
     }
 
+    const agentResult = await pool.query(
+        `
+        SELECT server_id
+        FROM agents
+        WHERE id = $1
+        `,
+        [agentId]
+    );
+
+    const agent = agentResult.rows[0];
+
+    if (!agent) {
+        throw new Error(
+            "Agente no encontrado"
+        );
+    }
+
+    const serverId =
+        agent.server_id;
+
     const result = await pool.query(
         `
         INSERT INTO server_metrics
@@ -234,6 +259,57 @@ async function saveStats(agentId, data) {
             disk
         ]
     );
+
+    if (cpu > 90) {
+
+        await createAlert(
+            serverId,
+            "CPU_HIGH",
+            `CPU al ${cpu}%`
+        );
+
+    } else {
+
+        await resolveAlert(
+            serverId,
+            "CPU_HIGH"
+        );
+
+    }
+
+    if (ram > 90) {
+
+        await createAlert(
+            serverId,
+            "RAM_HIGH",
+            `RAM al ${ram}%`
+        );
+
+    } else {
+
+        await resolveAlert(
+            serverId,
+            "RAM_HIGH"
+        );
+
+    }
+
+    if (disk > 90) {
+
+        await createAlert(
+            serverId,
+            "DISK_HIGH",
+            `Disco al ${disk}%`
+        );
+
+    } else {
+
+        await resolveAlert(
+            serverId,
+            "DISK_HIGH"
+        );
+
+    }
 
     return result.rows[0];
 }

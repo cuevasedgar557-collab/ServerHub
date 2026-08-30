@@ -4,9 +4,13 @@ async function getDashboard(userId) {
 
     const serversResult = await pool.query(
         `
-        SELECT id
-        FROM servers
-        WHERE user_id = $1
+        SELECT
+            s.id,
+            a.last_seen
+        FROM servers s
+        LEFT JOIN agents a
+            ON a.server_id = s.id
+        WHERE s.user_id = $1
         `,
         [userId]
     );
@@ -16,20 +20,11 @@ async function getDashboard(userId) {
     let onlineServers = 0;
     let offlineServers = 0;
 
+    const twoMinutes = 2 * 60 * 1000;
+
     for (const server of servers) {
 
-        const agentResult = await pool.query(
-            `
-            SELECT last_seen
-            FROM agents
-            WHERE server_id = $1
-            `,
-            [server.id]
-        );
-
-        const agent = agentResult.rows[0];
-
-        if (!agent || !agent.last_seen) {
+        if (!server.last_seen) {
 
             offlineServers++;
             continue;
@@ -38,14 +33,16 @@ async function getDashboard(userId) {
 
         const diff =
             Date.now() -
-            new Date(agent.last_seen).getTime();
-
-        const twoMinutes = 2 * 60 * 1000;
+            new Date(server.last_seen).getTime();
 
         if (diff <= twoMinutes) {
+
             onlineServers++;
+
         } else {
+
             offlineServers++;
+
         }
     }
 
