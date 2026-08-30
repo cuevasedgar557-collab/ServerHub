@@ -3,6 +3,7 @@ const axios = require("axios");
 const config =
     require("../config/config.json");
 
+const logger = require("../utils/logger");
 const { generarFirma } =
     require("../utils/signature");
 
@@ -66,7 +67,7 @@ async function verificarToken() {
 
         if (diasRestantes <= 15) {
 
-            console.log(
+            logger.info(
                 "🔄 Renovación preventiva de token"
             );
 
@@ -76,10 +77,12 @@ async function verificarToken() {
 
     } catch (error) {
 
-        console.error(
-            "❌ Error verificando token:",
-            error.response?.data ||
-            error.message
+        logger.error(
+            `❌ Error verificando token: ${
+        typeof error.response?.data === "object"
+            ? JSON.stringify(error.response.data)
+            : error.response?.data || error.message
+    }`
         );
 
     }

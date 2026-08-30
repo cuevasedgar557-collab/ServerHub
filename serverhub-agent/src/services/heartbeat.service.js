@@ -1,5 +1,6 @@
 const axios = require("axios");
 const config = require("../config/config.json");
+const logger = require("../utils/logger");
 const { generarFirma } = require("../utils/signature");
 const {
     generarNonce
@@ -47,14 +48,16 @@ async function enviarHeartbeat() {
             }
         );
 
-        console.log("💓 Heartbeat enviado");
+        logger.info("💓 Heartbeat enviado");
 
     } catch (error) {
 
-        console.error(
-            "❌ Error enviando heartbeat:",
-            error.response?.data ||
-            error.message
+        logger.error(
+            `❌ Error enviando heartbeat: ${
+        typeof error.response?.data === "object"
+            ? JSON.stringify(error.response.data)
+            : error.response?.data || error.message
+    }`
         );
 
         const response =

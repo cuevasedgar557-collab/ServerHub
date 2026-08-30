@@ -1,4 +1,5 @@
 const config = require("./config/config.json");
+const logger = require("./utils/logger");
 
 const {
     registerAgent
@@ -39,13 +40,13 @@ async function iniciarAgente() {
 
     try {
 
-        console.log("");
-        console.log(
+        logger.info("");
+        logger.info(
             `🚀 Iniciando ServerHub Agent v${config.version}`
         );
-        console.log("");
+        logger.info("");
 
-        console.log(
+        logger.info(
             "✅ Configuración cargada"
         );
         migrateFromConfig(config);
@@ -57,29 +58,29 @@ async function iniciarAgente() {
                 config.version
             );
 
-        console.log(
+        logger.info(
             `💻 Equipo: ${sistema.hostname}`
         );
 
-        console.log(
+        logger.info(
             `🖥️ Sistema: ${sistema.plataforma}`
         );
 
-        console.log(
+        logger.info(
             `⚙️ Arquitectura: ${sistema.arquitectura}`
         );
 
-        console.log(
+        logger.info(
             `⏱️ Tiempo encendido: ${sistema.tiempoEncendido}`
         );
 
         if (credentials.agentToken) {
 
-            console.log(
+            logger.info(
                 "✅ Agente identificado"
             );
 
-            console.log(
+            logger.info(
                 `🔑 Token: ${credentials.agentToken}`
             );
 
@@ -89,27 +90,27 @@ async function iniciarAgente() {
 
             iniciarHeartbeat();
 
-            console.log(
+            logger.info(
                 `✅ Heartbeat iniciado (${config.heartbeatIntervalMs} ms)`
             );
 
             iniciarMetricas();
 
-            console.log(
+            logger.info(
                 `✅ Recolección de métricas iniciada (${config.statsIntervalMs} ms)`
             );
 
-            console.log("");
-            console.log(
+            logger.info("");
+            logger.info(
                 "🟢 ServerHub Agent operativo"
             );
-            console.log("");
+            logger.info("");
 
             return;
 
         }
 
-        console.log(
+        logger.info(
             "⚠️ Agente no registrado"
         );
 
@@ -118,23 +119,23 @@ async function iniciarAgente() {
 
         if (!registrationKey) {
 
-            console.log("");
+            logger.info("");
 
-            console.log(
+            logger.info(
                 "❌ Debe proporcionar una Registration Key"
             );
 
-            console.log("");
+            logger.info("");
 
-            console.log(
+            logger.info(
                 "Uso:"
             );
 
-            console.log(
+            logger.info(
                 "node src/index.js SHUB-XXXX-XXXX"
             );
 
-            console.log("");
+            logger.info("");
 
             return;
 
@@ -145,13 +146,17 @@ async function iniciarAgente() {
                 registrationKey
             );
 
-        console.log(
+        logger.info(
             "✅ Agente registrado"
         );
 
-        console.log(
-            resultado
-        );
+        logger.info(
+    JSON.stringify(
+        resultado,
+        null,
+        2
+    )
+);
 
         await enviarInformacionSistema();
 
@@ -159,29 +164,31 @@ async function iniciarAgente() {
 
         iniciarHeartbeat();
 
-        console.log(
+        logger.info(
             `✅ Heartbeat iniciado (${config.heartbeatIntervalMs} ms)`
         );
 
         iniciarMetricas();
 
-        console.log(
+        logger.info(
             `✅ Recolección de métricas iniciada (${config.statsIntervalMs} ms)`
         );
 
-        console.log("");
-        console.log(
+        logger.info("");
+        logger.info(
             "🟢 ServerHub Agent operativo"
         );
-        console.log("");
+        logger.info("");
 
     } catch (error) {
 
-        console.error(
-            "❌ Error:",
-            error.response?.data ||
-            error.message
-        );
+        logger.error(
+    `❌ Error: ${
+        typeof error.response?.data === "object"
+            ? JSON.stringify(error.response.data)
+            : error.response?.data || error.message
+    }`
+);
 
     }
 

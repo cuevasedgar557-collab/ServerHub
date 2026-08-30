@@ -2,6 +2,7 @@ const axios = require("axios");
 
 
 const config = require("../config/config.json");
+const logger = require("../utils/logger");
 const { generarFirma } = require("../utils/signature");
 const { generarNonce } = require("../utils/nonce");
 const {
@@ -24,7 +25,7 @@ async function renovarToken() {
         credentials.agentSecret
     );
 
-    console.log(
+    logger.info(
     "🔄 Iniciando renovación de token..."
 );
 
@@ -46,7 +47,7 @@ async function renovarToken() {
     response.data.agentSecret
 );
 
-    console.log(
+    logger.info(
         "🔄 Token renovado correctamente"
     );
 

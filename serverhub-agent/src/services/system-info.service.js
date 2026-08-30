@@ -1,6 +1,7 @@
 const axios = require("axios");
 
 const config = require("../config/config.json");
+const logger = require("../utils/logger");
 const { generarFirma } =
     require("../utils/signature");
 
@@ -69,16 +70,18 @@ await axios.post(
     }
 );
 
-        console.log(
+        logger.info(
             "💻 Información del sistema enviada"
         );
 
     } catch (error) {
 
-        console.error(
-            "❌ Error enviando información del sistema:",
-            error.response?.data ||
-            error.message
+        logger.error(
+            `❌ Error enviando información del sistema: ${
+        typeof error.response?.data === "object"
+            ? JSON.stringify(error.response.data)
+            : error.response?.data || error.message
+    }`
         );
 
         const response =

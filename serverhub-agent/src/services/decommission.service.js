@@ -1,3 +1,5 @@
+const logger = require("../utils/logger");
+
 const {
     clearCredentials
 } = require(
@@ -8,21 +10,21 @@ function decommissionAgent() {
 
     clearCredentials();
 
-    console.log("");
+    logger.info("");
 
-    console.log(
+    logger.info(
         "⚠️ Agente dado de baja"
     );
 
-    console.log(
+    logger.info(
         "⚠️ Credenciales eliminadas"
     );
 
-    console.log(
+    logger.info(
         "⚠️ Reinicie el agente para registrarlo nuevamente"
     );
 
-    console.log("");
+    logger.info("");
 
     process.exit(0);
 }

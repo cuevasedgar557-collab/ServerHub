@@ -2,6 +2,7 @@ const axios = require("axios");
 const si = require("systeminformation");
 
 const config = require("../config/config.json");
+const logger = require("../utils/logger");
 const { generarFirma } =
     require("../utils/signature");
 
@@ -84,17 +85,22 @@ await axios.post(
     }
 );
 
-        console.log(
-            "📊 Métricas enviadas",
-            metricas
+        logger.info(
+            `📊 Métricas enviadas ${
+        typeof metricas === "object"
+            ? JSON.stringify(metricas, null, 2)
+            : metricas
+    }`
         );
 
     } catch (error) {
 
-        console.error(
-            "❌ Error enviando métricas:",
-            error.response?.data ||
-            error.message
+        logger.error(
+            `❌ Error enviando métricas: ${
+        typeof error.response?.data === "object"
+            ? JSON.stringify(error.response.data)
+            : error.response?.data || error.message
+    }`
         );
 
         const response =
