@@ -15,10 +15,18 @@ const healthRoutes =
 const alertRoutes =
     require("./routes/alert.routes");
 
+const commandRoutes =
+    require("./routes/command.routes");
+
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(
+    express.json({
+        limit: "25mb"
+    })
+);
+
 
 app.use("/api/server", serverRoutes);
 app.use("/api/auth", authRoutes);
@@ -27,5 +35,6 @@ app.use("/api/agent", agentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/health", healthRoutes);
 app.use( "/api/alerts", alertRoutes);
+app.use( "/api/agent/commands", commandRoutes);
 
 module.exports = app;

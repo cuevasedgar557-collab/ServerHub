@@ -36,6 +36,12 @@ const {
     "./services/credentials.service"
 );
 
+const {
+    iniciarPollingComandos
+} = require(
+    "./services/command-poll.service"
+);
+
 async function iniciarAgente() {
 
     try {
@@ -89,6 +95,7 @@ async function iniciarAgente() {
             iniciarMonitorToken();
 
             iniciarHeartbeat();
+            iniciarPollingComandos();
 
             logger.info(
                 `✅ Heartbeat iniciado (${config.heartbeatIntervalMs} ms)`
@@ -163,6 +170,7 @@ async function iniciarAgente() {
         iniciarMonitorToken();
 
         iniciarHeartbeat();
+        iniciarPollingComandos();
 
         logger.info(
             `✅ Heartbeat iniciado (${config.heartbeatIntervalMs} ms)`
