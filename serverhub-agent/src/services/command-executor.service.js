@@ -15,7 +15,9 @@ const {
 
 const {
     listarArchivos,
-    leerArchivo
+    leerArchivo,
+    escribirArchivo,
+    crearCarpeta
 } = require(
     "./file.service"
 );
@@ -75,6 +77,19 @@ async function executeCommand(
         case "DOWNLOAD_FILE":
 
     return await leerArchivo(
+        command.payload?.path
+    );
+
+        case "UPLOAD_FILE":
+
+    return await escribirArchivo(
+        command.payload?.path,
+        command.payload?.content
+    );
+
+        case "CREATE_FOLDER":
+
+    return await crearCarpeta(
         command.payload?.path
     );
 

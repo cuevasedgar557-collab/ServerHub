@@ -21,7 +21,9 @@ const {
     stopService,
     restartService,
     browseFiles,
-    downloadFile
+    downloadFile,
+    uploadFile,
+    createFolder
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -92,6 +94,19 @@ router.post(
     authenticate,
     downloadFile
 );
+
+router.post(
+    "/:id/files/upload",
+    authenticate,
+    uploadFile
+);
+
+router.post(
+    "/:id/files/create-folder",
+    authenticate,
+    createFolder
+);
+
 
 
 module.exports = router;

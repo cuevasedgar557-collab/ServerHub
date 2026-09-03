@@ -573,6 +573,132 @@ async function downloadFile(
 
 }
 
+async function uploadFile(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            path,
+            content
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "UPLOAD_FILE",
+                {
+                    path,
+                    content
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function createFolder(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            path
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "CREATE_FOLDER",
+                {
+                    path
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
 module.exports = {
     getHealth,
     getServerInfo,
@@ -589,5 +715,7 @@ module.exports = {
     stopService,
     restartService,
     browseFiles,
-    downloadFile
+    downloadFile,
+    uploadFile,
+    createFolder
 };

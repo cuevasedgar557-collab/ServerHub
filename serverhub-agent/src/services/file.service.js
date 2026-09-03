@@ -90,7 +90,7 @@ async function leerArchivo(
     await fs.promises.readFile(
         filePath
     );
-    
+
 return {
         fileName:
             path.basename(
@@ -107,7 +107,83 @@ return {
 
 }
 
+async function escribirArchivo(
+    filePath,
+    content
+) {
+
+    if (
+        !filePath ||
+        typeof filePath !== "string"
+    ) {
+        throw new Error(
+            "Ruta de archivo requerida"
+        );
+    }
+
+    if (
+        !content ||
+        typeof content !== "string"
+    ) {
+        throw new Error(
+            "Contenido requerido"
+        );
+    }
+
+    const buffer =
+        Buffer.from(
+            content,
+            "base64"
+        );
+
+    await fs.promises.writeFile(
+        filePath,
+        buffer
+    );
+
+    const stats =
+        await fs.promises.stat(
+            filePath
+        );
+
+    return {
+        success: true,
+        filePath,
+        size: stats.size
+    };
+
+}
+
+async function crearCarpeta(
+    folderPath
+) {
+
+    if (
+        !folderPath ||
+        typeof folderPath !== "string"
+    ) {
+        throw new Error(
+            "Ruta de carpeta requerida"
+        );
+    }
+
+    await fs.promises.mkdir(
+        folderPath,
+        {
+            recursive: true
+        }
+    );
+
+    return {
+        success: true,
+        path: folderPath
+    };
+
+}
+
 module.exports = {
     listarArchivos,
-    leerArchivo
+    leerArchivo,
+    escribirArchivo,
+    crearCarpeta
 };
