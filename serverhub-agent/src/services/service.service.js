@@ -191,6 +191,219 @@ function listarServicios() {
 
 }
 
+function iniciarServicio(
+    serviceName
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (
+                !serviceName ||
+                typeof serviceName !== "string"
+            ) {
+                return reject(
+                    new Error(
+                        "Nombre de servicio requerido"
+                    )
+                );
+            }
+
+            let comando;
+
+            if (
+                process.platform === "win32"
+            ) {
+
+                comando =
+                    `powershell -Command "Start-Service -Name '${serviceName}'"`;
+
+            } else {
+
+                comando =
+    `systemctl start ${serviceName}`;
+
+
+            }
+
+            exec(
+                comando,
+                {
+                    maxBuffer:
+                        10 * 1024 * 1024
+                },
+                (
+                    error,
+                    stdout,
+                    stderr
+                ) => {
+
+                    if (error) {
+
+                        return reject(
+                            new Error(
+                                stderr ||
+                                error.message
+                            )
+                        );
+
+                    }
+
+                    resolve({
+                        success: true,
+                        serviceName
+                    });
+
+                }
+            );
+
+        }
+    );
+
+}
+
+function detenerServicio(
+    serviceName
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (
+                !serviceName ||
+                typeof serviceName !== "string"
+            ) {
+                return reject(
+                    new Error(
+                        "Nombre de servicio requerido"
+                    )
+                );
+            }
+
+            let comando;
+
+            if (
+                process.platform === "win32"
+            ) {
+
+                comando =
+                    `powershell -Command "Stop-Service -Name '${serviceName}'"`;
+
+            } else {
+
+                comando =
+                    `systemctl stop ${serviceName}`;
+
+            }
+
+            exec(
+                comando,
+                {
+                    maxBuffer:
+                        10 * 1024 * 1024
+                },
+                (
+                    error,
+                    stdout,
+                    stderr
+                ) => {
+
+                    if (error) {
+
+                        return reject(
+                            new Error(
+                                stderr ||
+                                error.message
+                            )
+                        );
+
+                    }
+
+                    resolve({
+                        success: true,
+                        serviceName
+                    });
+
+                }
+            );
+
+        }
+    );
+
+}
+
+function reiniciarServicio(
+    serviceName
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (
+                !serviceName ||
+                typeof serviceName !== "string"
+            ) {
+                return reject(
+                    new Error(
+                        "Nombre de servicio requerido"
+                    )
+                );
+            }
+
+            let comando;
+
+            if (
+                process.platform === "win32"
+            ) {
+
+                comando =
+                    `powershell -Command "Restart-Service -Name '${serviceName}'"`;
+
+            } else {
+
+                comando =
+                    `systemctl restart ${serviceName}`;
+
+            }
+
+            exec(
+                comando,
+                {
+                    maxBuffer:
+                        10 * 1024 * 1024
+                },
+                (
+                    error,
+                    stdout,
+                    stderr
+                ) => {
+
+                    if (error) {
+
+                        return reject(
+                            new Error(
+                                stderr ||
+                                error.message
+                            )
+                        );
+
+                    }
+
+                    resolve({
+                        success: true,
+                        serviceName
+                    });
+
+                }
+            );
+
+        }
+    );
+
+}
 module.exports = {
-    listarServicios
+    listarServicios,
+    iniciarServicio,
+    detenerServicio,
+    reiniciarServicio
 };

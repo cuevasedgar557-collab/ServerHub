@@ -16,7 +16,10 @@ const {
     getServerMetrics,
     getLatestMetrics,
     getServerAgent,
-    verifyServerPassword
+    verifyServerPassword,
+    startService,
+    stopService,
+    restartService
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -56,6 +59,24 @@ router.post(
     "/:id/verify-password",
     authenticate,
     verifyServerPassword
+);
+
+router.post(
+    "/:id/services/start",
+    authenticate,
+    startService
+);
+
+router.post(
+    "/:id/services/stop",
+    authenticate,
+    stopService
+);
+
+router.post(
+    "/:id/services/restart",
+    authenticate,
+    restartService
 );
 
 

@@ -3,8 +3,12 @@ const {
 } = require(
     "./process.service"
 );
+
 const {
-    listarServicios
+    listarServicios,
+    iniciarServicio,
+    detenerServicio,
+    reiniciarServicio
 } = require(
     "./service.service"
 );
@@ -25,16 +29,35 @@ async function executeCommand(
 
         case "LIST_PROCESSES":
 
-    return {
-        processes: await listarProcesos()
-    };
+            return {
+                processes:
+                    await listarProcesos()
+            };
 
-    case "LIST_SERVICES":
+        case "LIST_SERVICES":
 
-    return {
-        services:
-            await listarServicios()
-    };
+            return {
+                services:
+                    await listarServicios()
+            };
+
+        case "START_SERVICE":
+
+            return await iniciarServicio(
+                command.payload?.serviceName
+            );
+
+        case "STOP_SERVICE":
+
+    return await detenerServicio(
+        command.payload?.serviceName
+    );
+
+        case "RESTART_SERVICE":
+
+    return await reiniciarServicio(
+        command.payload?.serviceName
+    );
 
         default:
 

@@ -10,9 +10,15 @@ const {
 
 const {
     getPendingCommand,
-    completeCommand
+    completeCommand,
+    createCommand
 } = require(
     "../controllers/command.controller"
+);
+
+router.post(
+    "/create",
+    createCommand
 );
 
 router.post(

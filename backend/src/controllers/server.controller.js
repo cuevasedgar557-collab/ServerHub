@@ -5,6 +5,11 @@ const getHealth = (req, res) => {
         message: "🚀 ServerHub Backend funcionando"
     });
 };
+const {
+    createCommand
+} = require(
+    "../services/command.service"
+);
 
 const getServerInfo = (req, res) => {
     res.json({
@@ -258,6 +263,192 @@ async function verifyServerPassword(
 
 }
 
+async function startService(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            serviceName
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "START_SERVICE",
+                {
+                    serviceName
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function stopService(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            serviceName
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "STOP_SERVICE",
+                {
+                    serviceName
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function restartService(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            serviceName
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "RESTART_SERVICE",
+                {
+                    serviceName
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
 module.exports = {
     getHealth,
     getServerInfo,
@@ -269,5 +460,8 @@ module.exports = {
     deleteServer,
     getServerMetrics,
     getServerAgent,
-    verifyServerPassword
+    verifyServerPassword,
+    startService,
+    stopService,
+    restartService
 };
