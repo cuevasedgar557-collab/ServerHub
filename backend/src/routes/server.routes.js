@@ -19,7 +19,9 @@ const {
     verifyServerPassword,
     startService,
     stopService,
-    restartService
+    restartService,
+    browseFiles,
+    downloadFile
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -77,6 +79,18 @@ router.post(
     "/:id/services/restart",
     authenticate,
     restartService
+);
+
+router.post(
+    "/:id/files/browse",
+    authenticate,
+    browseFiles
+);
+
+router.post(
+    "/:id/files/download",
+    authenticate,
+    downloadFile
 );
 
 

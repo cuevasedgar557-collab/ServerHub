@@ -1,6 +1,9 @@
 const commandService =
     require("../services/command.service");
 
+const pool =
+    require("../config/db");
+
 async function getPendingCommand(
     req,
     res
@@ -91,8 +94,72 @@ async function createCommand(
     }
 
 }
+
+async function downloadCommandFile(
+    req,
+    res
+) {
+
+    try {
+
+        const result =
+            await pool.query(
+                `
+                SELECT result
+                FROM agent_commands
+                WHERE id = $1
+                AND status = 'COMPLETED'
+                `,
+                [req.params.id]
+            );
+
+        const command =
+            result.rows[0];
+
+        if (
+            !command ||
+            !command.result
+        ) {
+
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Archivo no encontrado"
+            });
+
+        }
+
+        const {
+            fileName,
+            content
+        } = command.result;
+
+        const buffer =
+            Buffer.from(
+                content,
+                "base64"
+            );
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${fileName}"`
+        );
+
+        res.send(buffer);
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
 module.exports = {
     getPendingCommand,
     completeCommand,
-    createCommand
+    createCommand,
+    downloadCommandFile
 };

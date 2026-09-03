@@ -11,7 +11,8 @@ const {
 const {
     getPendingCommand,
     completeCommand,
-    createCommand
+    createCommand,
+    downloadCommandFile
 } = require(
     "../controllers/command.controller"
 );
@@ -33,4 +34,9 @@ router.post(
     completeCommand
 );
 
+
+router.get(
+    "/download/:id",
+    downloadCommandFile
+);
 module.exports = router;

@@ -13,6 +13,13 @@ const {
     "./service.service"
 );
 
+const {
+    listarArchivos,
+    leerArchivo
+} = require(
+    "./file.service"
+);
+
 async function executeCommand(
     command
 ) {
@@ -57,6 +64,18 @@ async function executeCommand(
 
     return await reiniciarServicio(
         command.payload?.serviceName
+    );
+
+        case "FILE_BROWSER":
+
+    return await listarArchivos(
+        command.payload?.path
+    );
+
+        case "DOWNLOAD_FILE":
+
+    return await leerArchivo(
+        command.payload?.path
     );
 
         default:

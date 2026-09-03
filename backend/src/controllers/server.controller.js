@@ -449,6 +449,130 @@ async function restartService(
 
 }
 
+async function browseFiles(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            path
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "FILE_BROWSER",
+                {
+                    path
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function downloadFile(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            password,
+            path
+        } = req.body;
+
+        const valid =
+            await serverService
+                .verifyServerPassword(
+                    req.user.id,
+                    req.params.id,
+                    password
+                );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Contraseña administrativa incorrecta"
+            });
+
+        }
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "DOWNLOAD_FILE",
+                {
+                    path
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
 module.exports = {
     getHealth,
     getServerInfo,
@@ -463,5 +587,7 @@ module.exports = {
     verifyServerPassword,
     startService,
     stopService,
-    restartService
+    restartService,
+    browseFiles,
+    downloadFile
 };
