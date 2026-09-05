@@ -1,16 +1,30 @@
-# React + Vite
+# Frontend de ServerHub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaz React 19 servida y construida con Vite 8.
 
-Currently, two official plugins are available:
+## Desarrollo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+La API se configura con `VITE_API_URL`. El valor predeterminado es `http://localhost:3000`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Scripts
 
-## Expanding the ESLint configuration
+- `npm run dev`: inicia el servidor de desarrollo Vite.
+- `npm run build`: genera la compilación de producción.
+- `npm run preview`: sirve localmente la compilación generada.
+- `npm run lint`: ejecuta ESLint.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Rutas de la interfaz
+
+- `/login`: inicio de sesión.
+- `/register`: registro de usuario.
+- `/dashboard`: dashboard protegido.
+- `/servers/:id`: detalle protegido de un servidor.
+- `/`: redirige a `/dashboard`.
+- Cualquier otra ruta muestra la página `NotFound`.
+
+El dashboard consulta datos cada 20 segundos. El detalle de servidor actualiza el estado del agente y la última métrica cada 15 segundos.
