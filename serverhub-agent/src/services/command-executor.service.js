@@ -17,7 +17,10 @@ const {
     listarArchivos,
     leerArchivo,
     escribirArchivo,
-    crearCarpeta
+    crearCarpeta,
+    renombrar,
+    eliminar,
+    mover
 } = require(
     "./file.service"
 );
@@ -91,6 +94,26 @@ async function executeCommand(
 
     return await crearCarpeta(
         command.payload?.path
+    );
+
+        case "RENAME_FILE":
+
+    return await renombrar(
+        command.payload?.oldPath,
+        command.payload?.newPath
+    );
+
+        case "DELETE_FILE":
+
+    return await eliminar(
+        command.payload?.path
+    );
+
+        case "MOVE_FILE":
+
+    return await mover(
+        command.payload?.sourcePath,
+        command.payload?.destinationPath
     );
 
         default:

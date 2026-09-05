@@ -6,6 +6,12 @@ const {
 } = require("../middlewares/auth.middleware");
 
 const {
+    requireAdminSession
+} = require(
+    "../middlewares/admin-session.middleware"
+);
+
+const {
     getHealth,
     getServerInfo,
     createServer,
@@ -23,7 +29,10 @@ const {
     browseFiles,
     downloadFile,
     uploadFile,
-    createFolder
+    createFolder,
+    renameFile,
+    deleteFile,
+    moveFile
 } = require("../controllers/server.controller");
 
 router.get("/health", getHealth);
@@ -68,45 +77,70 @@ router.post(
 router.post(
     "/:id/services/start",
     authenticate,
+    requireAdminSession,
     startService
 );
 
 router.post(
     "/:id/services/stop",
     authenticate,
+    requireAdminSession,
     stopService
 );
 
 router.post(
     "/:id/services/restart",
     authenticate,
+    requireAdminSession,
     restartService
 );
 
 router.post(
     "/:id/files/browse",
     authenticate,
+    requireAdminSession,
     browseFiles
 );
 
 router.post(
     "/:id/files/download",
     authenticate,
+    requireAdminSession,
     downloadFile
 );
 
 router.post(
     "/:id/files/upload",
     authenticate,
+    requireAdminSession,
     uploadFile
 );
 
 router.post(
     "/:id/files/create-folder",
     authenticate,
+    requireAdminSession,
     createFolder
 );
+router.post(
+    "/:id/files/rename",
+    authenticate,
+    requireAdminSession,
+    renameFile
+);
 
+router.post(
+    "/:id/files/delete",
+    authenticate,
+    requireAdminSession,
+    deleteFile
+);
 
+router.post(
+    "/:id/files/move",
+    authenticate,
+    requireAdminSession,
+    moveFile
+);
 
 module.exports = router;

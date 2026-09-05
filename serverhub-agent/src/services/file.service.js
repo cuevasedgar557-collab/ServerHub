@@ -181,9 +181,129 @@ async function crearCarpeta(
 
 }
 
+async function renombrar(
+    oldPath,
+    newPath
+) {
+
+    if (
+        !oldPath ||
+        typeof oldPath !== "string"
+    ) {
+        throw new Error(
+            "Ruta origen requerida"
+        );
+    }
+
+    if (
+        !newPath ||
+        typeof newPath !== "string"
+    ) {
+        throw new Error(
+            "Ruta destino requerida"
+        );
+    }
+
+    await fs.promises.rename(
+        oldPath,
+        newPath
+    );
+
+    return {
+        success: true,
+        oldPath,
+        newPath
+    };
+
+}
+
+async function eliminar(
+    targetPath
+) {
+
+    if (
+        !targetPath ||
+        typeof targetPath !== "string"
+    ) {
+        throw new Error(
+            "Ruta requerida"
+        );
+    }
+
+    const stats =
+        await fs.promises.stat(
+            targetPath
+        );
+
+    if (
+        stats.isDirectory()
+    ) {
+
+        await fs.promises.rm(
+            targetPath,
+            {
+                recursive: true,
+                force: true
+            }
+        );
+
+    } else {
+
+        await fs.promises.unlink(
+            targetPath
+        );
+
+    }
+
+    return {
+        success: true,
+        path: targetPath
+    };
+
+}
+
+async function mover(
+    sourcePath,
+    destinationPath
+) {
+
+    if (
+        !sourcePath ||
+        typeof sourcePath !== "string"
+    ) {
+        throw new Error(
+            "Ruta origen requerida"
+        );
+    }
+
+    if (
+        !destinationPath ||
+        typeof destinationPath !== "string"
+    ) {
+        throw new Error(
+            "Ruta destino requerida"
+        );
+    }
+
+    await fs.promises.rename(
+        sourcePath,
+        destinationPath
+    );
+
+    return {
+        success: true,
+        sourcePath,
+        destinationPath
+    };
+
+}
+
 module.exports = {
     listarArchivos,
     leerArchivo,
     escribirArchivo,
-    crearCarpeta
+    crearCarpeta,
+    renombrar,
+    eliminar,
+    mover
 };

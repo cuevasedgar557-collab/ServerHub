@@ -271,27 +271,8 @@ async function startService(
     try {
 
         const {
-            password,
             serviceName
         } = req.body;
-
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -333,27 +314,8 @@ async function stopService(
     try {
 
         const {
-            password,
             serviceName
         } = req.body;
-
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -395,27 +357,8 @@ async function restartService(
     try {
 
         const {
-            password,
             serviceName
         } = req.body;
-
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -457,27 +400,8 @@ async function browseFiles(
     try {
 
         const {
-            password,
             path
         } = req.body;
-
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -519,27 +443,8 @@ async function downloadFile(
     try {
 
         const {
-            password,
             path
         } = req.body;
-
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -581,28 +486,9 @@ async function uploadFile(
     try {
 
         const {
-            password,
             path,
             content
         } = req.body;
-
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -645,27 +531,9 @@ async function createFolder(
     try {
 
         const {
-            password,
-            path
-        } = req.body;
+    path
+} = req.body;
 
-        const valid =
-            await serverService
-                .verifyServerPassword(
-                    req.user.id,
-                    req.params.id,
-                    password
-                );
-
-        if (!valid) {
-
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Contraseña administrativa incorrecta"
-            });
-
-        }
 
         const agent =
             await serverService
@@ -680,6 +548,139 @@ async function createFolder(
                 "CREATE_FOLDER",
                 {
                     path
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function renameFile(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            oldPath,
+            newPath
+        } = req.body;
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "RENAME_FILE",
+                {
+                    oldPath,
+                    newPath
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function deleteFile(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            path
+        } = req.body;
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "DELETE_FILE",
+                {
+                    path
+                }
+            );
+
+        res.status(201).json({
+            success: true,
+            command
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+}
+
+async function moveFile(
+    req,
+    res
+) {
+
+    try {
+
+        const {
+            sourcePath,
+            destinationPath
+        } = req.body;
+
+        const agent =
+            await serverService
+                .getServerAgent(
+                    req.user.id,
+                    req.params.id
+                );
+
+        const command =
+            await createCommand(
+                agent.id,
+                "MOVE_FILE",
+                {
+                    sourcePath,
+                    destinationPath
                 }
             );
 
@@ -717,5 +718,8 @@ module.exports = {
     browseFiles,
     downloadFile,
     uploadFile,
-    createFolder
+    createFolder,
+    renameFile,
+    deleteFile,
+    moveFile
 };

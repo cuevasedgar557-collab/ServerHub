@@ -18,6 +18,9 @@ const alertRoutes =
 const commandRoutes =
     require("./routes/command.routes");
 
+const adminSessionRoutes =
+    require("./routes/admin-session.routes");
+
 const app = express();
 
 app.use(cors());
@@ -36,5 +39,5 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/health", healthRoutes);
 app.use( "/api/alerts", alertRoutes);
 app.use( "/api/agent/commands", commandRoutes);
-
+app.use("/api/server",adminSessionRoutes);
 module.exports = app;
