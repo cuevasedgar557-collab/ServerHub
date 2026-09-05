@@ -7,6 +7,7 @@ function ConfirmDialog({
   message,
   confirmLabel = "Confirmar",
   loading = false,
+  loadingLabel = "Eliminando...",
   requirePassword = false,
   passwordError = "",
   onCancel,
