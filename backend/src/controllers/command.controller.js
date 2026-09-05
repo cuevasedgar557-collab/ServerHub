@@ -64,37 +64,6 @@ async function completeCommand(
 
 }
 
-async function createCommand(
-    req,
-    res
-) {
-
-    try {
-
-        const command =
-            await commandService
-                .createCommand(
-                    req.body.agentId,
-                    req.body.commandType,
-                    req.body.payload || {}
-                );
-
-        res.status(201).json({
-            success: true,
-            command
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-
-    }
-
-}
-
 async function downloadCommandFile(
     req,
     res
@@ -105,12 +74,15 @@ async function downloadCommandFile(
         const result =
             await pool.query(
                 `
-                SELECT result
-                FROM agent_commands
-                WHERE id = $1
-                AND status = 'COMPLETED'
+                SELECT ac.result
+                FROM agent_commands ac
+                JOIN agents a ON a.id = ac.agent_id
+                JOIN servers s ON s.id = a.server_id
+                WHERE ac.id = $1
+                AND ac.status = 'COMPLETED'
+                AND s.user_id = $2
                 `,
-                [req.params.id]
+                [req.params.id, req.user.id]
             );
 
         const command =
@@ -160,6 +132,5 @@ async function downloadCommandFile(
 module.exports = {
     getPendingCommand,
     completeCommand,
-    createCommand,
     downloadCommandFile
 };

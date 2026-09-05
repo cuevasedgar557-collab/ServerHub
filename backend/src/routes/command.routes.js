@@ -3,6 +3,12 @@ const express = require("express");
 const router = express.Router();
 
 const {
+    authenticate
+} = require(
+    "../middlewares/auth.middleware"
+);
+
+const {
     authenticateAgent
 } = require(
     "../middlewares/agent-auth.middleware"
@@ -11,15 +17,9 @@ const {
 const {
     getPendingCommand,
     completeCommand,
-    createCommand,
     downloadCommandFile
 } = require(
     "../controllers/command.controller"
-);
-
-router.post(
-    "/create",
-    createCommand
 );
 
 router.post(
@@ -37,6 +37,7 @@ router.post(
 
 router.get(
     "/download/:id",
+    authenticate,
     downloadCommandFile
 );
 module.exports = router;
